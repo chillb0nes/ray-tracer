@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<HBox prefHeight="310.0" spacing="1.0" styleClass="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <Pane prefWidth="204.0" styleClass="inputGroup">
+            <children>
+                <Label layoutX="61.0" layoutY="-8.0" styleClass="group-label" text="Object settings" textFill="#ababab">
+                    <padding>
+                        <Insets left="3.0" right="3.0" />
+                    </padding>
+                </Label>
+            </children>
+        </Pane>
+        <Pane styleClass="inputGroup">
+            <children>
+                <Label layoutX="44.0" layoutY="-8.0" styleClass="group-label" text="Material settings">
+                    <padding>
+                        <Insets left="3.0" right="3.0" />
+                    </padding>
+                </Label>
+                <VBox layoutY="10.0" spacing="2.0">
+                    <children>
+                        <FlowPane hgap="3.0" maxWidth="155.0" prefHeight="25.0" prefWidth="155.0">
+                            <children>
+                                <Label text="Diffuse:">
+                                    <padding>
+                                        <Insets right="2.0" />
+                                    </padding>
+                                </Label>
+                                <ColorPicker prefWidth="110.0" />
+                            </children>
+                            <VBox.margin>
+                                <Insets />
+                            </VBox.margin>
+                        </FlowPane>
+                        <Label text="Diffuse:" />
+                        <TextField maxWidth="155.0" prefWidth="155.0" />
+                        <Label text="Specular:" />
+                        <TextField maxWidth="155.0" prefWidth="155.0" />
+                        <Label text="Reflectivity:" />
+                        <TextField maxWidth="155.0" prefWidth="155.0" />
+                        <Label text="Refractivity:" />
+                        <TextField maxWidth="155.0" prefWidth="155.0" />
+                        <Label text="Transparency:" />
+                        <TextField maxWidth="155.0" prefWidth="155.0" />
+                    </children>
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                    </padding>
+                </VBox>
+            </children>
+        </Pane>
+    </children>
+    <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+    </padding>
+</HBox>

@@ -1,0 +1,79 @@
+@mixin size($width, $height:$width)
+    -fx-min-width: $width
+    -fx-min-height: $height
+    -fx-pref-width: $width
+    -fx-pref-height: $height
+    -fx-max-width: $width
+    -fx-max-height: $height
+
+* > *
+    -fx-accent: #3399FF
+    -fx-faint-focus-color: transparent
+    -fx-focus-color: -fx-accent
+    -fx-default-button: #ececec
+    -fx-background-radius: 0
+    -fx-focus-traversable: false
+
+.root
+    -fx-background-color: #f4f4f4
+
+.error-notification
+    -fx-background-color: #dc3545dd
+    -fx-max-width: 300px
+    -fx-max-height: 90px
+    .label
+        -fx-text-fill: #323232
+
+.close-btn
+    -fx-btn-size: 12px
+    @include size(-fx-btn-size)
+    .button
+        @include size(-fx-btn-size)
+        -fx-background-color: #323232
+        -fx-shape: "M0,10 L10,0 L60,50 L110,0 L120,10 L70,60 L120,110 L110,120 L60,70 L10,120 L0,110 L50,60Z"
+        &:hover
+            -fx-background-color: derive(#323232, 15%)
+        &:pressed
+            -fx-btn-size: 10px
+
+.input-group
+    -fx-border-color: #cecece
+    .group-label
+        -fx-background-color: #f4f4f4
+        -fx-text-fill: #959595
+
+.spinner
+    .increment-arrow-button, .decrement-arrow-button
+        -fx-padding: 1 2
+
+.color-palette .hyperlink
+    -fx-border-color: transparent
+    -fx-underline: false
+    &:focused
+        -fx-border-color: transparent
+        -fx-underline: false
+
+.check-box .box .mark
+    -fx-shape: "M0,30 L10,20 L30,40 L70,0 L80,10 L30,60 Z"
+
+.slider
+    .track
+        -fx-pref-height: 4px
+        -fx-background-color: #cecece
+    .thumb
+        -fx-background-image: url('/icons/slider.png')
+        -fx-background-repeat: no-repeat
+        -fx-background-position: top left
+        -fx-pref-width: 11px
+        -fx-pref-height: 21px
+
+.scroll-bar
+    &:vertical
+        .thumb
+            -fx-background-color: #cecece
+        .increment-button .increment-arrow
+            -fx-shape: "M 0 0 h 7 l -3.5 4 z"
+        .decrement-button .decrement-arrow
+            -fx-shape: "M 0 0 h 7 l -3.5 -4 z"
+    &:horizontal *
+        -fx-padding: 0
