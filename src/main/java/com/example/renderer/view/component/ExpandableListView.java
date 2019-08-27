@@ -1,54 +1,51 @@
 package com.example.renderer.view.component;
 
-import com.example.renderer.service.DefaultControlFactory;
 import com.example.renderer.view.control.CloseButton;
+import com.example.renderer.view.util.NoFocusModel;
+import com.example.renderer.view.util.NoSelectionModel;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.binding.When;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
-import lombok.extern.java.Log;
 
-import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.logging.Level;
+import java.util.function.Supplier;
 
 import static javafx.geometry.Pos.CENTER;
 
-@Log
 public class ExpandableListView<T> extends ListView<T> {
-    private Class<T> clazz;
     private Bounds cellSize;
     private DoubleBinding cellWidthProperty;
+    private Supplier<ValueNode<T>> nodeFactory;
 
     private ExpandableListView() {
-        // TODO
+        this(SimpleValueNode::new);
+        setPrefWidth(200);
     }
 
-    public ExpandableListView(Class<T> clazz) {
-        // TODO
-    }
-
-    public ExpandableListView(Collection<? extends T> items, Class<T> clazz) {//TODO without clazz, with check
-        this.clazz = clazz;
-        //setSelectionModel(NoSelectionModel.getInstance());
-        //setFocusModel(NoFocusModel.getInstance());
-
+    public ExpandableListView(Supplier<ValueNode<T>> nodeFactory) {
+        this.nodeFactory = nodeFactory;
+        setItems(FXCollections.observableArrayList());
         setCellFactory(ExpandableListCell::new);
 
-        calculateCellSize();
+        setSelectionModel(NoSelectionModel.getInstance());
+        setFocusModel(NoFocusModel.getInstance());
 
-        setItems(FXCollections.observableArrayList(items));
+        calculateCellSize();
 
         BooleanBinding scrollBarVisible = Bindings.size(getItems())
                 .multiply(cellSize.getHeight())
@@ -62,8 +59,20 @@ public class ExpandableListView<T> extends ListView<T> {
         paddingProperty().setValue(Insets.EMPTY);
     }
 
+    public ExpandableListView(Collection<? extends T> items, Supplier<ValueNode<T>> nodeFactory) {
+        this(nodeFactory);
+        getItems().addAll(items);
+    }
+
+
+    public ExpandableListView(Collection<? extends T> items) {
+        this(items, SimpleValueNode::new);
+        setPrefWidth(200);
+    }
+
     private void calculateCellSize() {
-        Region cellContent = (Region) new DefaultControlFactory().getByClass(clazz);
+        //TODO binding
+        Node cellContent = (Node) nodeFactory.get();
         TitledPane titledPane = createTitledPane(null);
         titledPane.setContent(cellContent);
         Pane root = new Pane(titledPane);
@@ -107,10 +116,28 @@ public class ExpandableListView<T> extends ListView<T> {
         return titledPane;
     }
 
-    private class ExpandableListCell<T> extends ListCell<T> {
+    private static class SimpleValueNode extends Label implements ValueNode {
+        @Override
+        public ReadOnlyObjectProperty<Object> valueProperty() {
+            return new ReadOnlyObjectWrapper<>(getUserData());
+        }
+
+        @Override
+        public Object getValue() {
+            return getUserData();
+        }
+
+        @Override
+        public void setValue(Object value) {
+            setUserData(value);
+            setText(value.toString());
+        }
+    }
+
+    private class ExpandableListCell extends ListCell<T> {
         private TitledPane titledPane;
 
-        public ExpandableListCell(ListView<T> listView) {
+        ExpandableListCell(ListView<T> listView) {
             titledPane = createTitledPane(event -> listView.getItems().remove(getItem()));
             titledPane.prefWidthProperty().bind(cellWidthProperty);
             paddingProperty().setValue(Insets.EMPTY);
@@ -136,14 +163,9 @@ public class ExpandableListView<T> extends ListView<T> {
         }
 
         private void updateContent(T item) {
-            Region content = (Region) new DefaultControlFactory().getByClass(clazz);
-            try {
-                Method setValue = content.getClass().getDeclaredMethod("setValue", clazz);
-                setValue.invoke(content, item);
-            } catch (ReflectiveOperationException e) {
-                log.log(Level.WARNING, "Couldn't update content of ExpandableListView", e);
-            }
-            titledPane.setContent(content);
+            ValueNode<T> node = nodeFactory.get();
+            node.setValue(item);
+            titledPane.setContent((Node) node);
         }
     }
 }

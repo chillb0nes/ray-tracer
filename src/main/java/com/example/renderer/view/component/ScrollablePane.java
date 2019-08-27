@@ -5,11 +5,9 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.EventHandler;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.StackPane;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j2;
 
-import java.util.logging.Level;
-
-@Log
+@Log4j2
 public class ScrollablePane extends StackPane {
     private static final int DELAY_MS = 500;
     private int scrollCounter;
@@ -38,7 +36,7 @@ public class ScrollablePane extends StackPane {
                     }
                     scrollCounter--;
                 } catch (InterruptedException e) {
-                    log.log(Level.WARNING, "ScrollablePane helper thread interrupted", e);
+                    log.warn("ScrollablePane helper thread interrupted", e);
                     Thread.currentThread().interrupt();
                 }
             });

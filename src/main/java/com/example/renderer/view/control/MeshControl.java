@@ -20,7 +20,7 @@ public class MeshControl extends VBox implements ValueNode<Mesh> {
     private ObjectProperty<Mesh> value;
 
     public MeshControl() {
-        listView = new ExpandableListView<>(Collections.emptyList(), Triangle.class);
+        listView = new ExpandableListView<>(Collections.emptyList());
         //TODO bind value to all triangle controls
         listView.getItems().addListener((ListChangeListener<? super Triangle>) change -> {
             System.out.println(change);

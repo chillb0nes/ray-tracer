@@ -1,19 +1,16 @@
 package com.example.renderer;
 
 import com.example.renderer.controller.UIController;
-import com.example.renderer.model.Material;
-import com.example.renderer.model.object.Sphere;
-import com.example.renderer.service.ModalService;
 import com.example.renderer.view.control.MeshControl;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Point3D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public class Main extends Application {
     /*private double xOffset = 0;
     private double yOffset = 0;*/
@@ -53,6 +50,12 @@ public class Main extends Application {
         primaryStage.setScene(scene);
 
         primaryStage.show();
+
+        log.trace("trace");
+        log.info("info");
+        log.warn("warn");
+        log.debug("debug");
+        log.error("error");
 
         controller.setUp();
     }
