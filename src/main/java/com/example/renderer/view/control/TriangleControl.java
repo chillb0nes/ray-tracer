@@ -16,7 +16,7 @@ public class TriangleControl extends VBox implements ValueNode<Triangle> {
     private ObjectProperty<Triangle> value;
 
     public TriangleControl() {
-        this("Point A", "Point B", "Point C");
+        this("Vertex A", "Vertex B", "Vertex C");
     }
 
     public TriangleControl(String v0Name, String v1Name, String v2Name) {

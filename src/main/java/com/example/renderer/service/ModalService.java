@@ -57,7 +57,7 @@ public class ModalService {
     private Node transformUiParameter(Field annotatedField) {
         UIParameter uiParameter = annotatedField.getAnnotation(UIParameter.class);
 
-        Node control;
+        Node control = null;
         try {
             ControlFactory controlFactory = uiParameter.controlFactory().getDeclaredConstructor().newInstance();
             control = controlFactory.getByClass(annotatedField.getType());

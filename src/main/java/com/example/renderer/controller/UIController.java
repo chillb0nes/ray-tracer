@@ -17,22 +17,18 @@ import javafx.animation.Timeline;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.geometry.Point3D;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.util.Collections;
@@ -41,6 +37,7 @@ import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@Log4j2
 @Setter
 public class UIController {
     @FXML
@@ -228,6 +225,7 @@ public class UIController {
 
     public Thread.UncaughtExceptionHandler getExceptionHandler() {
         return (t, e) -> {
+            log.error("Uncaught exception:", e);
             hideErrorBox();
 
             String message = ExceptionUtils.getMessage(e);
@@ -240,7 +238,7 @@ public class UIController {
     }
 
     public void printPixelPosition(MouseEvent e) {
-        System.out.printf("%s %s%n", e.getSceneX(), e.getSceneY());
+        log.debug("Mouse click at {}:{}", (int) e.getSceneX(), (int) e.getSceneY());
     }
 
     public void shutdown() {

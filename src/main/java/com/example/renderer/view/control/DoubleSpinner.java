@@ -34,6 +34,10 @@ public class DoubleSpinner extends Spinner<Double> implements ValueNode<Double> 
         getValueFactory().setValue(value);
     }
 
+    public DoubleSpinner() {
+        this(-Double.MAX_VALUE, Double.MAX_VALUE);
+    }
+
     private static final StringConverter<Double> STRING_CONVERTER = new StringConverter<Double>() {
         @Override
         public String toString(Double number) {
@@ -51,8 +55,4 @@ public class DoubleSpinner extends Spinner<Double> implements ValueNode<Double> 
             return number.matches(DECIMAL_REGEX) ? Double.parseDouble(number) : 0;
         }
     };
-
-    public DoubleSpinner() {
-        this(-Double.MAX_VALUE, Double.MAX_VALUE);
-    }
 }
