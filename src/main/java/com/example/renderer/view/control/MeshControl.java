@@ -19,27 +19,18 @@ public class MeshControl extends VBox implements ValueNode<Mesh> {
     private Button addButton;
     private ObjectProperty<Mesh> value;
 
-    //TODO simplify
     public MeshControl() {
-        Mesh mesh = new Mesh();
-        value = new SimpleObjectProperty<>(mesh);
-        listView = new ExpandableListView<>(mesh.getTriangles());
-        mesh.setTriangles(listView.getItems());
-
-        addButton = new Button("Add");
-        addButton.setOnAction(event -> listView.getItems().add(Triangle.EMPTY));
-        addButton.setMaxWidth(Double.MAX_VALUE);
-
-        double fontSize = addButton.getFont().getSize();
-        addButton.setGraphic(Icon.ADD.withSize(fontSize));
-
-        getChildren().addAll(listView, addButton);
+        this(new ExpandableListView<>());
     }
 
     public MeshControl(Supplier<ValueNode<Triangle>> nodeFactory) {
+        this(new ExpandableListView<>(nodeFactory));
+    }
+
+    private MeshControl(ExpandableListView<Triangle> listView) {
+        this.listView = listView;
         Mesh mesh = new Mesh();
         value = new SimpleObjectProperty<>(mesh);
-        listView = new ExpandableListView<>(mesh.getTriangles(), nodeFactory);
         mesh.setTriangles(listView.getItems());
 
         addButton = new Button("Add");
