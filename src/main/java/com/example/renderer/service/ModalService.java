@@ -29,29 +29,29 @@ public class ModalService {
         stage.setScene(scene);
         stage.initOwner(owner);
         stage.initModality(Modality.WINDOW_MODAL);
-        stage.setResizable(false);
+        //stage.setResizable(false);
 
         return stage;
     }
 
     public Pane renderEditLayout(Object3D object3D) {
-        Pane leftColumn = createObjectParametersPane();
-        Pane rightColumn = new Pane();
+        Pane left = createObjectParametersPane();
+        Pane right = new Pane();
 
         Arrays.stream(object3D.getClass().getDeclaredFields())
                 .peek(field -> field.setAccessible(true))
                 .filter(field -> field.isAnnotationPresent(UIParameter.class))
                 .sorted(Comparator.comparing(field -> field.getAnnotation(UIParameter.class).order()))
                 .map(this::transformUiParameter)
-                .forEach(node -> leftColumn.getChildren().add(node));
+                .forEach(node -> left.getChildren().add(node));
 
         if (object3D instanceof Renderable) {
-            //rightColumn = createMaterialParametersPane();
+            //right = createMaterialParametersPane();
         }
         if (object3D instanceof LightSource) {
-            //rightColumn  = createLightParametersPane();
+            //right  = createLightParametersPane();
         }
-        return new HBox(leftColumn, rightColumn);
+        return new HBox(left, right);
     }
 
     private Node transformUiParameter(Field annotatedField) {

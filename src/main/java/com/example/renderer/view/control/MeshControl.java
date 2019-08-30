@@ -6,12 +6,10 @@ import com.example.renderer.view.component.ExpandableListView;
 import com.example.renderer.view.component.ValueNode;
 import com.example.renderer.view.util.Icon;
 import javafx.beans.property.ObjectProperty;
-import javafx.collections.ListChangeListener;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import lombok.Getter;
-
-import java.util.Collections;
 
 @Getter
 public class MeshControl extends VBox implements ValueNode<Mesh> {
@@ -20,17 +18,16 @@ public class MeshControl extends VBox implements ValueNode<Mesh> {
     private ObjectProperty<Mesh> value;
 
     public MeshControl() {
-        listView = new ExpandableListView<>(Collections.emptyList());
-        //TODO bind value to all triangle controls
-        listView.getItems().addListener((ListChangeListener<? super Triangle>) change -> {
-            System.out.println(change);
-        });
+        Mesh mesh = new Mesh();
+        value = new SimpleObjectProperty<>(mesh);
+        listView = new ExpandableListView<>(mesh.getTriangles());
+        mesh.setTriangles(listView.getItems());
 
         addButton = new Button("Add");
         addButton.setOnAction(event -> listView.getItems().add(Triangle.EMPTY));
         addButton.setMaxWidth(Double.MAX_VALUE);
 
-        double fontSize = addButton.fontProperty().get().getSize();
+        double fontSize = addButton.getFont().getSize();
         addButton.setGraphic(Icon.ADD.withSize(fontSize));
 
         getChildren().addAll(listView, addButton);

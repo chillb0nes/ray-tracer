@@ -2,22 +2,22 @@ package com.example.renderer.model.object;
 
 import com.example.renderer.model.Material;
 import com.example.renderer.model.RayHit;
-import com.example.renderer.service.custom.RadiusControlFactory;
 import javafx.geometry.Point3D;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import static java.lang.Math.*;
+import static java.lang.Math.sqrt;
 
 @Data
-@AllArgsConstructor
-public class Sphere implements Renderable {
+public class Sphere extends Renderable {
 
-    @UIParameter
     private Point3D center;
-    @UIParameter(controlFactory = RadiusControlFactory.class)
     private double radius;
-    private Material material;
+
+    public Sphere(Point3D center, double radius, Material material) {
+        this.center = center;
+        this.radius = radius;
+        this.material = material;
+    }
 
     @Override
     public RayHit intersection(Point3D origin, Point3D direction) {

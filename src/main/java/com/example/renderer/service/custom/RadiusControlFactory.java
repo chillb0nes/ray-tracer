@@ -6,6 +6,7 @@ import javafx.scene.Node;
 
 import java.math.BigDecimal;
 
+@Deprecated
 public class RadiusControlFactory implements ControlFactory {
 
     @Override

@@ -1,9 +1,9 @@
 package com.example.renderer.service;
 
-import com.example.renderer.model.light.LightSource;
 import com.example.renderer.model.Material;
 import com.example.renderer.model.RayHit;
 import com.example.renderer.model.Scene;
+import com.example.renderer.model.light.LightSource;
 import com.example.renderer.model.object.Renderable;
 import javafx.concurrent.Task;
 import javafx.geometry.Point3D;
@@ -17,7 +17,6 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import static com.example.renderer.model.RayHit.*;
 import static java.lang.Math.*;
 import static java.util.Comparator.comparing;
 
@@ -110,7 +109,7 @@ public class RayTracer {
                 .map(renderable -> renderable.intersection(origin, direction))
                 .filter(RayHit::isHit)
                 .min(comparing(RayHit::getDistance))
-                .orElse(MISS);
+                .orElse(RayHit.MISS);
     }
 
     private Color rayCast(Point3D origin, Point3D direction, int depth) {
@@ -120,7 +119,7 @@ public class RayTracer {
 
         RayHit rayHit = getRayHit(origin, direction);
 
-        if (rayHit == MISS) {
+        if (RayHit.MISS == rayHit) {
             return backgroundColor;
         }
 

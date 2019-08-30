@@ -6,17 +6,14 @@ import javafx.geometry.Point3D;
 import lombok.Data;
 
 @Data
-public class Triangle implements Renderable {
-    public static final Triangle EMPTY = new Triangle(Point3D.ZERO, Point3D.ZERO, Point3D.ZERO);
-    @UIParameter
-    private Point3D v0;
-    @UIParameter
-    private Point3D v1;
-    @UIParameter
-    private Point3D v2;
+public class Triangle extends Renderable {
 
-    private Material material;
+    private Point3D v0;
+    private Point3D v1;
+    private Point3D v2;
     private Point3D center;
+
+    public static final Triangle EMPTY = new Triangle(Point3D.ZERO, Point3D.ZERO, Point3D.ZERO);
 
     public Triangle(Point3D v0, Point3D v1, Point3D v2) {
         this.v0 = v0;

@@ -12,7 +12,28 @@ import java.util.Locale;
 import static javafx.geometry.Pos.BASELINE_RIGHT;
 
 public class DoubleSpinner extends Spinner<Double> implements ValueNode<Double> {
+
     private static final String DECIMAL_REGEX = "-?\\d+(\\.\\d+)?";
+
+    public DoubleSpinner(@NamedArg("min") double min,
+                         @NamedArg("max") double max) {
+        setEditable(true);
+        getEditor().setAlignment(BASELINE_RIGHT);
+        setValueFactory(createValueFactory(min, max));
+    }
+
+    private SpinnerValueFactory<Double> createValueFactory(double min, double max) {
+        SpinnerValueFactory<Double> spinnerValueFactory;
+        spinnerValueFactory = new DoubleSpinnerValueFactory(min, max, 0, 0.01);
+        spinnerValueFactory.setConverter(STRING_CONVERTER);
+        return spinnerValueFactory;
+    }
+
+    @Override
+    public void setValue(Double value) {
+        getValueFactory().setValue(value);
+    }
+
     private static final StringConverter<Double> STRING_CONVERTER = new StringConverter<Double>() {
         @Override
         public String toString(Double number) {
@@ -31,26 +52,7 @@ public class DoubleSpinner extends Spinner<Double> implements ValueNode<Double> 
         }
     };
 
-    public DoubleSpinner(@NamedArg("min") double min,
-                         @NamedArg("max") double max) {
-        setEditable(true);
-        getEditor().setAlignment(BASELINE_RIGHT);
-        setValueFactory(createValueFactory(min, max));
-    }
-
     public DoubleSpinner() {
         this(-Double.MAX_VALUE, Double.MAX_VALUE);
-    }
-
-    private SpinnerValueFactory<Double> createValueFactory(double min, double max) {
-        SpinnerValueFactory<Double> spinnerValueFactory;
-        spinnerValueFactory = new DoubleSpinnerValueFactory(min, max, 0, 0.01);
-        spinnerValueFactory.setConverter(STRING_CONVERTER);
-        return spinnerValueFactory;
-    }
-
-    @Override
-    public void setValue(Double value) {
-        getValueFactory().setValue(value);
     }
 }

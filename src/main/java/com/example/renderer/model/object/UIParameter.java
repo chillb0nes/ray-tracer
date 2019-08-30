@@ -14,7 +14,7 @@ public @interface UIParameter {
 
     String value() default "";
 
-    int order() default 0;
+    int order() default -1;
 
     boolean showTitle() default true;
 
