@@ -12,8 +12,28 @@ import java.util.Locale;
 import static javafx.geometry.Pos.BASELINE_RIGHT;
 
 public class DoubleSpinner extends Spinner<Double> implements ValueNode<Double> {
-
     private static final String DECIMAL_REGEX = "-?\\d+(\\.\\d+)?";
+    private static final StringConverter<Double> STRING_CONVERTER = new StringConverter<Double>() {
+        @Override
+        public String toString(Double number) {
+            if (number == null) {
+                return "";
+            }
+            return String.format(Locale.US, "%.2f", number);
+        }
+
+        @Override
+        public Double fromString(String number) {
+            if (number == null) {
+                return null;
+            }
+            return number.matches(DECIMAL_REGEX) ? Double.parseDouble(number) : 0;
+        }
+    };
+
+    public DoubleSpinner() {
+        this(-Double.MAX_VALUE, Double.MAX_VALUE);
+    }
 
     public DoubleSpinner(@NamedArg("min") double min,
                          @NamedArg("max") double max) {
@@ -33,26 +53,4 @@ public class DoubleSpinner extends Spinner<Double> implements ValueNode<Double> 
     public void setValue(Double value) {
         getValueFactory().setValue(value);
     }
-
-    public DoubleSpinner() {
-        this(-Double.MAX_VALUE, Double.MAX_VALUE);
-    }
-
-    private static final StringConverter<Double> STRING_CONVERTER = new StringConverter<Double>() {
-        @Override
-        public String toString(Double number) {
-            if (number == null) {
-                return "";
-            }
-            return String.format(Locale.US, "%.2f", number);
-        }
-
-        @Override
-        public Double fromString(String number) {
-            if (number == null) {
-                return null;
-            }
-            return number.matches(DECIMAL_REGEX) ? Double.parseDouble(number) : 0;
-        }
-    };
 }

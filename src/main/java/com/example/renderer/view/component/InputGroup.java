@@ -68,11 +68,11 @@ public class InputGroup extends StackPane {
         return spacing;
     }
 
-    public final void setSpacing(double value) {
-        spacing.setValue(value);
-    }
-
     public final double getSpacing() {
         return spacing.get();
+    }
+
+    public final void setSpacing(double value) {
+        spacing.setValue(value);
     }
 }

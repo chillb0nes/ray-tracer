@@ -29,6 +29,7 @@ public class MeshControl extends VBox implements ValueNode<Mesh> {
 
     private MeshControl(ExpandableListView<Triangle> listView) {
         this.listView = listView;
+
         Mesh mesh = new Mesh();
         value = new SimpleObjectProperty<>(mesh);
         mesh.setTriangles(listView.getItems());
@@ -49,12 +50,12 @@ public class MeshControl extends VBox implements ValueNode<Mesh> {
     }
 
     @Override
-    public void setValue(Mesh value) {
-        valueProperty().set(value);
+    public Mesh getValue() {
+        return value.get();
     }
 
     @Override
-    public Mesh getValue() {
-        return value.get();
+    public void setValue(Mesh value) {
+        valueProperty().set(value);
     }
 }

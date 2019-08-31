@@ -61,13 +61,13 @@ public class Point3DSpinner extends HBox implements ValueNode<Point3D> {
     }
 
     @Override
-    public void setValue(Point3D value) {
-        this.value.set(value);
+    public Point3D getValue() {
+        return value.get();
     }
 
     @Override
-    public Point3D getValue() {
-        return value.get();
+    public void setValue(Point3D value) {
+        this.value.set(value);
     }
 
     private StackPane labeled(Spinner spinner, String text) {

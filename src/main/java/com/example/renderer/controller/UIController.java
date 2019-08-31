@@ -45,9 +45,9 @@ public class UIController {
     @FXML
     public VBox sidebar;
     @FXML
-    private ImageView image;
-    @FXML
     public ProgressIndicator loader;
+    @FXML
+    private ImageView image;
     @FXML
     private Label fovLabel;
     @FXML

@@ -54,13 +54,13 @@ public class TriangleControl extends VBox implements ValueNode<Triangle> {
     }
 
     @Override
-    public void setValue(Triangle value) {
-        valueProperty().set(value);
+    public Triangle getValue() {
+        return value.get();
     }
 
     @Override
-    public Triangle getValue() {
-        return value.get();
+    public void setValue(Triangle value) {
+        valueProperty().set(value);
     }
 
 }

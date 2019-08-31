@@ -10,17 +10,8 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class ScrollablePane extends StackPane {
     private static final int DELAY_MS = 500;
-    private int scrollCounter;
-
     private final ObjectProperty<EventHandler<? super ScrollEvent>> onScrollEnded;
-
-    public ObjectProperty<EventHandler<? super ScrollEvent>> onScrollEndedProperty() {
-        return onScrollEnded;
-    }
-
-    public void setOnScrollEnded(EventHandler<? super ScrollEvent> handler) {
-        onScrollEnded.setValue(handler);
-    }
+    private int scrollCounter;
 
     public ScrollablePane() {
         scrollCounter = 0;
@@ -43,5 +34,17 @@ public class ScrollablePane extends StackPane {
             thread.setDaemon(true);
             thread.start();
         });
+    }
+
+    public EventHandler<? super ScrollEvent> getOnScrollEnded() {
+        return onScrollEnded.get();
+    }
+
+    public void setOnScrollEnded(EventHandler<? super ScrollEvent> handler) {
+        onScrollEnded.setValue(handler);
+    }
+
+    public ObjectProperty<EventHandler<? super ScrollEvent>> onScrollEndedProperty() {
+        return onScrollEnded;
     }
 }

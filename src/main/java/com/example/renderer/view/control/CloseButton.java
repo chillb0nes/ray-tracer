@@ -25,11 +25,11 @@ public class CloseButton extends StackPane {
         return onAction.get();
     }
 
-    public ObjectProperty<EventHandler<ActionEvent>> onActionProperty() {
-        return onAction;
-    }
-
     public void setOnAction(EventHandler<ActionEvent> value) {
         onAction.set(value);
+    }
+
+    public ObjectProperty<EventHandler<ActionEvent>> onActionProperty() {
+        return onAction;
     }
 }

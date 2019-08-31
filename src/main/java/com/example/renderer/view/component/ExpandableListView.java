@@ -3,6 +3,7 @@ package com.example.renderer.view.component;
 import com.example.renderer.view.control.CloseButton;
 import com.example.renderer.view.util.NoFocusModel;
 import com.example.renderer.view.util.NoSelectionModel;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -24,6 +25,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -102,13 +104,18 @@ public class ExpandableListView<T> extends ListView<T> {
 
     private void calculateCellSize() {
         //TODO binding?
-        Node cellContent = (Node) nodeFactory.get();
+        ValueNode<T> node = nodeFactory.get();
+        Preconditions.checkArgument(node instanceof Node);
+        Node cellContent = (Node) node;
+
         TitledPane titledPane = createTitledPane(null);
         titledPane.setContent(cellContent);
+
         Pane root = new Pane(titledPane);
         new Scene(root);
         root.applyCss();
         root.layout();
+
         cellSize = titledPane.getLayoutBounds();
     }
 
@@ -182,6 +189,7 @@ public class ExpandableListView<T> extends ListView<T> {
         private void updateContent(T item) {
             ValueNode<T> node = nodeFactory.get();
             node.setValue(item);
+            Preconditions.checkArgument(node instanceof Node);
             titledPane.setContent((Node) node);
         }
 

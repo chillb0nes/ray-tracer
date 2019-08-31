@@ -16,7 +16,7 @@ import static java.util.Comparator.comparing;
 public class Mesh extends Renderable {
 
     private Point3D center;
-    private List<Triangle> triangles = Lists.newArrayList();
+    private List<Triangle> triangles;
 
     public Mesh(Point3D center, List<Triangle> triangles, Material material) {
         this.center = center;

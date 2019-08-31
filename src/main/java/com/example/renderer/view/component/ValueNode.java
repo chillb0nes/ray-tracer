@@ -6,8 +6,8 @@ public interface ValueNode<V> {
 
     ReadOnlyObjectProperty<V> valueProperty();
 
-    void setValue(V value);
-
     V getValue();
+
+    void setValue(V value);
 
 }
