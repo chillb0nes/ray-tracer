@@ -9,12 +9,10 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import lombok.Getter;
 
-import static javafx.geometry.Pos.CENTER;
+import static javafx.geometry.Pos.TOP_CENTER;
 
 public class InputGroup extends StackPane {
-    private static final String DEFAULT_NAME = "Input group";
     private static final int PADDING = 10;
 
     private Label groupLabel;
@@ -25,13 +23,13 @@ public class InputGroup extends StackPane {
         getStyleClass().add("input-group");
         setPadding(new Insets(PADDING * 1.5, PADDING, PADDING, PADDING));
 
-        groupLabel = new Label(DEFAULT_NAME);
+        groupLabel = new Label("Input group");
         groupLabel.getStyleClass().add("group-label");
         groupLabel.setPadding(new Insets(3));
         groupLabel.translateYProperty().bind(heightProperty().add(PADDING / 2).divide(-2));
 
         children = new VBox();
-        children.setAlignment(CENTER);
+        children.setAlignment(TOP_CENTER);
         children.setSpacing(PADDING);
 
         spacing = new SimpleDoubleProperty();

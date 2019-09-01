@@ -1,6 +1,6 @@
 package com.example.renderer.view.control;
 
-import com.example.renderer.JavaFXThreadingRule;
+import com.example.renderer.BaseJavaFXTest;
 import com.example.renderer.model.Material;
 import com.example.renderer.model.light.LightSource;
 import com.example.renderer.model.object.Mesh;
@@ -8,16 +8,13 @@ import com.example.renderer.model.object.Sphere;
 import com.example.renderer.model.object.Triangle;
 import javafx.geometry.Point3D;
 import javafx.scene.paint.Color;
-import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
-public class ValueNodeTest {
-    @Rule
-    public JavaFXThreadingRule jfxRule = new JavaFXThreadingRule();
+public class ValueNodeTest extends BaseJavaFXTest {
 
     @Test
     public void testDoubleSpinner() {

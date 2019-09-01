@@ -13,6 +13,7 @@
     -fx-default-button: #ececec
     //-fx-background-radius: 0
     //-fx-focus-traversable: false
+    //-fx-body-color: derive(-fx-color,-5%)
 
 .root
     -fx-background-color: #f4f4f4
@@ -66,10 +67,10 @@
         -fx-background-position: top left
         -fx-pref-width: 11px
         -fx-pref-height: 21px
-    &:focused .thumb
-        -fx-thumb-background: #a4a4a4
-        -fx-background-color: -fx-thumb-background, -fx-inner-border, -fx-body-color, -fx-body-color
-        -fx-background-insets: 0, 1, 2, 2, 1
+    //&:focused .thumb
+        //-fx-thumb-background: #a4a4a4
+        //-fx-background-color: -fx-thumb-background, -fx-inner-border, -fx-body-color, -fx-body-color
+        //-fx-background-insets: 0, 1, 2, 2, 1
 
 .scroll-bar
     &:vertical

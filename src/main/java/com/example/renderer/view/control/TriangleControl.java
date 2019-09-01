@@ -8,6 +8,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import lombok.Getter;
 
+import static com.example.renderer.view.util.ObservableUtils.addListener;
+
 @Getter
 public class TriangleControl extends VBox implements ValueNode<Triangle> {
     private Point3DSpinner v0Spinner;
@@ -32,20 +34,20 @@ public class TriangleControl extends VBox implements ValueNode<Triangle> {
         setSpacing(2);
 
         value = new ReadOnlyObjectWrapper<>();
-        value.addListener(((observable, oldValue, newValue) -> {
-            v0Spinner.setValue(newValue.getV0());
-            v1Spinner.setValue(newValue.getV1());
-            v2Spinner.setValue(newValue.getV2());
-        }));
+        addListener(value, newTriangle -> {
+            v0Spinner.setValue(newTriangle.getV0());
+            v1Spinner.setValue(newTriangle.getV1());
+            v2Spinner.setValue(newTriangle.getV2());
+        });
 
-        v0Spinner.valueProperty().addListener(
-                (observable, oldPoint, newPoint) -> value.get().setV0(newPoint));
+        addListener(v0Spinner.valueProperty(),
+                newPoint -> value.get().setV0(newPoint));
 
-        v1Spinner.valueProperty().addListener(
-                (observable, oldPoint, newPoint) -> value.get().setV1(newPoint));
+        addListener(v1Spinner.valueProperty(),
+                newPoint -> value.get().setV1(newPoint));
 
-        v2Spinner.valueProperty().addListener(
-                (observable, oldPoint, newPoint) -> value.get().setV2(newPoint));
+        addListener(v2Spinner.valueProperty(),
+                newPoint -> value.get().setV2(newPoint));
     }
 
     @Override

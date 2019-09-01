@@ -30,9 +30,9 @@ public class LightSourceControl extends VBox implements ValueNode<LightSource> {
         setSpacing(2);
 
         value = new ReadOnlyObjectWrapper<>();
-        addListener(value, newValue -> {
-            centerSpinner.setValue(newValue.getCenter());
-            intensitySpinner.setValue(newValue.getIntensity());
+        addListener(value, newLight -> {
+            centerSpinner.setValue(newLight.getCenter());
+            intensitySpinner.setValue(newLight.getIntensity());
         });
 
         addListener(centerSpinner.valueProperty(),

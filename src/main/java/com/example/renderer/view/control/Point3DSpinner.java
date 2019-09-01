@@ -10,6 +10,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import lombok.Getter;
 
+import static com.example.renderer.view.util.ObservableUtils.addListener;
+
 @Getter
 public class Point3DSpinner extends HBox implements ValueNode<Point3D> {
     private Spinner<Double> xSpinner;
@@ -30,25 +32,25 @@ public class Point3DSpinner extends HBox implements ValueNode<Point3D> {
         //setSpacing(-1);
 
         value = new ReadOnlyObjectWrapper<>(Point3D.ZERO);
-        value.addListener(((observable, oldValue, newValue) -> {
-            xSpinner.getValueFactory().setValue(newValue.getX());
-            ySpinner.getValueFactory().setValue(newValue.getY());
-            zSpinner.getValueFactory().setValue(newValue.getZ());
-        }));
+        addListener(value, newPoint -> {
+            xSpinner.getValueFactory().setValue(newPoint.getX());
+            ySpinner.getValueFactory().setValue(newPoint.getY());
+            zSpinner.getValueFactory().setValue(newPoint.getZ());
+        });
 
-        xSpinner.valueProperty().addListener((observable, oldX, newX) -> {
+        addListener(xSpinner.valueProperty(), newX -> {
             Point3D oldPoint = value.get();
             Point3D newPoint = new Point3D(newX, oldPoint.getY(), oldPoint.getZ());
             value.set(newPoint);
         });
 
-        ySpinner.valueProperty().addListener((observable, oldY, newY) -> {
+        addListener(ySpinner.valueProperty(), newY -> {
             Point3D oldPoint = value.get();
             Point3D newPoint = new Point3D(oldPoint.getX(), newY, oldPoint.getZ());
             value.set(newPoint);
         });
 
-        zSpinner.valueProperty().addListener((observable, oldZ, newZ) -> {
+        addListener(zSpinner.valueProperty(), newZ -> {
             Point3D oldPoint = value.get();
             Point3D newPoint = new Point3D(oldPoint.getX(), oldPoint.getY(), newZ);
             value.set(newPoint);

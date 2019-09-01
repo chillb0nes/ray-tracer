@@ -8,6 +8,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import lombok.Getter;
 
+import static com.example.renderer.view.util.ObservableUtils.addListener;
+
 @Getter
 public class SphereControl extends VBox implements ValueNode<Sphere> {
     private Point3DSpinner centerSpinner;
@@ -28,16 +30,16 @@ public class SphereControl extends VBox implements ValueNode<Sphere> {
         setSpacing(2);
 
         value = new ReadOnlyObjectWrapper<>();
-        value.addListener(((observable, oldValue, newValue) -> {
-            centerSpinner.setValue(newValue.getCenter());
-            radiusSpinner.setValue(newValue.getRadius());
-        }));
+        addListener(value, newSphere -> {
+            centerSpinner.setValue(newSphere.getCenter());
+            radiusSpinner.setValue(newSphere.getRadius());
+        });
 
-        centerSpinner.valueProperty().addListener(
-                (observable, oldPoint, newPoint) -> value.get().setCenter(newPoint));
+        addListener(centerSpinner.valueProperty(),
+                newPoint -> value.get().setCenter(newPoint));
 
-        radiusSpinner.valueProperty().addListener(
-                (observable, oldRadius, newRadius) -> value.get().setRadius(newRadius));
+        addListener(radiusSpinner.valueProperty(),
+                newRadius -> value.get().setRadius(newRadius));
     }
 
     @Override

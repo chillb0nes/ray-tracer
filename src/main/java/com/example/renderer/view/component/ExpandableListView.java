@@ -25,10 +25,10 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 
 import java.util.Collection;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import static com.example.renderer.view.util.ObservableUtils.addListener;
 import static javafx.geometry.Pos.CENTER;
 
 public class ExpandableListView<T> extends ListView<T> {
@@ -155,13 +155,13 @@ public class ExpandableListView<T> extends ListView<T> {
             titledPane.prefWidthProperty().bind(cellWidthProperty);
             titledPane.setAnimated(false);
 
-            titledPane.expandedProperty().addListener(((observable, oldValue, expanded) -> {
+            addListener(titledPane.expandedProperty(), expanded -> {
                 if (expanded) {
                     expandedItems.add(getIndex());
                 } else {
                     expandedItems.remove(getIndex());
                 }
-            }));
+            });
 
             paddingProperty().setValue(Insets.EMPTY);
         }

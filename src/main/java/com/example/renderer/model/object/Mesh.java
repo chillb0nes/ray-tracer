@@ -18,8 +18,7 @@ public class Mesh extends Renderable {
     private Point3D center;
     private List<Triangle> triangles = Lists.newArrayList();
 
-    public Mesh(Point3D center, List<Triangle> triangles, Material material) {
-        this.center = center;
+    public Mesh(List<Triangle> triangles, Material material) {
         this.triangles = triangles;
         this.material = material;
     }
