@@ -21,10 +21,14 @@ public class InputGroup extends StackPane {
 
     public InputGroup() {
         getStyleClass().add("input-group");
+        setStyle("-fx-border-color: -fx-box-border");
         setPadding(new Insets(PADDING * 1.5, PADDING, PADDING, PADDING));
 
         groupLabel = new Label("Input group");
         groupLabel.getStyleClass().add("group-label");
+        groupLabel.setStyle(
+                "-fx-background-color: -fx-background;" +
+                "-fx-text-fill: derive(-fx-box-border,-20%)");
         groupLabel.setPadding(new Insets(3));
         groupLabel.translateYProperty().bind(heightProperty().add(PADDING / 2).divide(-2));
 
