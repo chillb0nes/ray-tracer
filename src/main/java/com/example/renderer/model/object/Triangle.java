@@ -19,7 +19,7 @@ public class Triangle extends Renderable {
         this.v0 = v0;
         this.v1 = v1;
         this.v2 = v2;
-        center = v0.add(v1).add(v2).multiply(1. / 3);
+        center = v0.add(v1).add(v2).multiply(1. / 3);//todo binding
     }
 
     public Triangle(Point3D v0, Point3D v1, Point3D v2, Material material) {

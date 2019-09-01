@@ -57,5 +57,6 @@ public class MeshControl extends VBox implements ValueNode<Mesh> {
     @Override
     public void setValue(Mesh value) {
         valueProperty().set(value);
+        listView.getItems().setAll(value.getTriangles());
     }
 }
