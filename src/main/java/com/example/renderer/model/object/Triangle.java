@@ -2,29 +2,41 @@ package com.example.renderer.model.object;
 
 import com.example.renderer.model.Material;
 import com.example.renderer.model.RayHit;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point3D;
 import lombok.Data;
 
 @Data
 public class Triangle extends Renderable {
 
-    private Point3D v0;
-    private Point3D v1;
-    private Point3D v2;
-    private Point3D center;
+    private ObjectProperty<Point3D> v0;
+    private ObjectProperty<Point3D> v1;
+    private ObjectProperty<Point3D> v2;
+    private ReadOnlyObjectWrapper<Point3D> center;
 
     public static final Triangle EMPTY = new Triangle(Point3D.ZERO, Point3D.ZERO, Point3D.ZERO);
 
     public Triangle(Point3D v0, Point3D v1, Point3D v2) {
-        this.v0 = v0;
-        this.v1 = v1;
-        this.v2 = v2;
-        center = v0.add(v1).add(v2).multiply(1. / 3);//todo binding
+        this.v0 = new SimpleObjectProperty<>(v0);
+        this.v1 = new SimpleObjectProperty<>(v1);
+        this.v2 = new SimpleObjectProperty<>(v2);
+        bindCenter();
     }
 
     public Triangle(Point3D v0, Point3D v1, Point3D v2, Material material) {
         this(v0, v1, v2);
         this.material = material;
+    }
+
+    private void bindCenter() {
+        center = new ReadOnlyObjectWrapper<>();
+        center.bind(Bindings.createObjectBinding(
+                () -> v0.get().add(v1.get()).add(v2.get()).multiply(1. / 3),
+                v0, v1, v1));
     }
 
     @Override
@@ -71,8 +83,8 @@ public class Triangle extends Renderable {
 
         return new RayHit(true, originToIntersection, intersectionPoint, normal2.normalize());*/
 
-        Point3D e0 = v1.subtract(v0);
-        Point3D e1 = v2.subtract(v0);
+        Point3D e0 = v1.get().subtract(v0.get());
+        Point3D e1 = v2.get().subtract(v0.get());
         Point3D pvec = direction.crossProduct(e1);
         double det = e0.dotProduct(pvec);
 
@@ -81,7 +93,7 @@ public class Triangle extends Renderable {
         }
 
         double invDet = 1 / det;
-        Point3D tvec = origin.subtract(v0);
+        Point3D tvec = origin.subtract(v0.get());
         double u = tvec.dotProduct(pvec) * invDet;
         if (u < 0 || u > 1) {
             return RayHit.MISS;
@@ -110,5 +122,73 @@ public class Triangle extends Renderable {
                 distance,
                 origin.add(direction.multiply(distance)),
                 normal);
+    }
+
+    public Point3D getV0() {
+        return v0.get();
+    }
+
+    public ObjectProperty<Point3D> v0Property() {
+        return v0;
+    }
+
+    public void setV0(Point3D v0) {
+        this.v0.set(v0);
+    }
+
+    public Point3D getV1() {
+        return v1.get();
+    }
+
+    public ObjectProperty<Point3D> v1Property() {
+        return v1;
+    }
+
+    public void setV1(Point3D v1) {
+        this.v1.set(v1);
+    }
+
+    public Point3D getV2() {
+        return v2.get();
+    }
+
+    public ObjectProperty<Point3D> v2Property() {
+        return v2;
+    }
+
+    public void setV2(Point3D v2) {
+        this.v2.set(v2);
+    }
+
+    public Point3D getCenter() {
+        return center.get();
+    }
+
+    @Override
+    public void setCenter(Point3D newPoint) {
+        Point3D oldPoint = this.center.get();
+
+        double deltaX = newPoint.getX() - oldPoint.getX();
+        double deltaY = newPoint.getY() - oldPoint.getY();
+        double deltaZ = newPoint.getZ() - oldPoint.getZ();
+
+        v0.set(new Point3D(
+                v0.get().getX() + deltaX,
+                v0.get().getY() + deltaY,
+                v0.get().getZ() + deltaZ));
+
+        v1.set(new Point3D(
+                v1.get().getX() + deltaX,
+                v1.get().getY() + deltaY,
+                v1.get().getZ() + deltaZ));
+
+        v2.set(new Point3D(
+                v2.get().getX() + deltaX,
+                v2.get().getY() + deltaY,
+                v2.get().getZ() + deltaZ));
+    }
+
+    public ReadOnlyObjectProperty<Point3D> centerProperty() {
+        return center.getReadOnlyProperty();
     }
 }

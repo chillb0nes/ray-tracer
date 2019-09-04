@@ -10,8 +10,6 @@ import javafx.geometry.Point3D;
 import javafx.scene.paint.Color;
 import org.junit.Test;
 
-import java.util.Arrays;
-
 import static org.junit.Assert.*;
 
 public class ValueNodeTest extends BaseJavaFXTest {
@@ -21,28 +19,24 @@ public class ValueNodeTest extends BaseJavaFXTest {
         double value = 0.5;
         DoubleSpinner control = new DoubleSpinner();
         control.setValue(value);
-        assertEquals(value, control.getValue(), 0);
+        assertDoubleEquals(value, control.getValue());
     }
 
     @Test
     public void testPoint3DSpinner() {
-        Point3D value = new Point3D(1, 2, 3);
+        Point3D value = randomPoint3D();
         Point3DSpinner control = new Point3DSpinner();
         control.setValue(value);
-        assertEquals(value, control.getValue());
+        assertPoint3DEquals(value, control.getValue());
 
-        assertEquals(value.getX(), control.getXSpinner().getValue(), 0);
-        assertEquals(value.getY(), control.getYSpinner().getValue(), 0);
-        assertEquals(value.getZ(), control.getZSpinner().getValue(), 0);
+        assertDoubleEquals(value.getX(), control.getXSpinner().getValue());
+        assertDoubleEquals(value.getY(), control.getYSpinner().getValue());
+        assertDoubleEquals(value.getZ(), control.getZSpinner().getValue());
     }
 
     @Test
     public void testTriangleControl() {
-        Triangle value = new Triangle(
-                new Point3D(1, 2, 3),
-                new Point3D(4, 5, 6),
-                new Point3D(7, 8, 9)
-        );
+        Triangle value = randomTriangle();
         TriangleControl control = new TriangleControl();
         control.setValue(value);
         assertEquals(value, control.getValue());
@@ -54,18 +48,7 @@ public class ValueNodeTest extends BaseJavaFXTest {
 
     @Test
     public void testMeshControl() {
-        Mesh value = new Mesh(
-                new Triangle(
-                        new Point3D(1, 2, 3),
-                        new Point3D(4, 5, 6),
-                        new Point3D(7, 8, 9)
-                ),
-                new Triangle(
-                        new Point3D(-1, -2, -3),
-                        new Point3D(-4, -5, -6),
-                        new Point3D(-7, -8, -9)
-                )
-        );
+        Mesh value = randomMesh();
         MeshControl control = new MeshControl();
         control.setValue(value);
         assertEquals(value, control.getValue());
@@ -75,24 +58,24 @@ public class ValueNodeTest extends BaseJavaFXTest {
 
     @Test
     public void testSphereControl() {
-        Sphere value = new Sphere(new Point3D(1, 2, 3), 1, null);
+        Sphere value = new Sphere(randomPoint3D(), 1, null);
         SphereControl control = new SphereControl();
         control.setValue(value);
         assertEquals(value, control.getValue());
 
-        assertEquals(value.getCenter(), control.getCenterSpinner().getValue());
-        assertEquals(value.getRadius(), control.getRadiusSpinner().getValue(), 0);
+        assertPoint3DEquals(value.getCenter(), control.getCenterSpinner().getValue());
+        assertDoubleEquals(value.getRadius(), control.getRadiusSpinner().getValue());
     }
 
     @Test
     public void testLightSourceControl() {
-        LightSource value = new LightSource(new Point3D(1, 2, 3), 0.5);
+        LightSource value = new LightSource(randomPoint3D(), 0.5);
         LightSourceControl control = new LightSourceControl();
         control.setValue(value);
         assertEquals(value, control.getValue());
 
-        assertEquals(value.getCenter(), control.getCenterSpinner().getValue());
-        assertEquals(value.getIntensity(), control.getIntensitySpinner().getValue(), 0);
+        assertPoint3DEquals(value.getCenter(), control.getCenterSpinner().getValue());
+        assertDoubleEquals(value.getIntensity(), control.getIntensitySpinner().getValue());
     }
 
     @Test
@@ -111,11 +94,11 @@ public class ValueNodeTest extends BaseJavaFXTest {
         assertEquals(value, control.getValue());
 
         assertEquals(value.getColor(), control.getColorPicker().getValue());
-        assertEquals(value.getDiffuse(), control.getDiffuseSpinner().getValue(), 0);
-        assertEquals(value.getSpecular(), control.getSpecularSpinner().getValue(), 0);
-        assertEquals(value.getReflectivity(), control.getReflectivitySpinner().getValue(), 0);
-        assertEquals(value.getTransmittance(), control.getTransmittanceSpinner().getValue(), 0);
-        assertEquals(value.getSpecularExp(), control.getSpecularExpSpinner().getValue(), 0);
-        assertEquals(value.getIor(), control.getIorSpinner().getValue(), 0);
+        assertDoubleEquals(value.getDiffuse(), control.getDiffuseSpinner().getValue());
+        assertDoubleEquals(value.getSpecular(), control.getSpecularSpinner().getValue());
+        assertDoubleEquals(value.getReflectivity(), control.getReflectivitySpinner().getValue());
+        assertDoubleEquals(value.getTransmittance(), control.getTransmittanceSpinner().getValue());
+        assertDoubleEquals(value.getSpecularExp(), control.getSpecularExpSpinner().getValue());
+        assertDoubleEquals(value.getIor(), control.getIorSpinner().getValue());
     }
 }
