@@ -2,7 +2,7 @@ package com.example.renderer.view.control;
 
 import com.example.renderer.model.object.Triangle;
 import com.example.renderer.view.component.ValueNode;
-import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
@@ -15,7 +15,7 @@ public class TriangleControl extends VBox implements ValueNode<Triangle> {
     private Point3DSpinner v0Spinner;
     private Point3DSpinner v1Spinner;
     private Point3DSpinner v2Spinner;
-    private ObjectProperty<Triangle> value;
+    private ReadOnlyObjectWrapper<Triangle> value;
 
     public TriangleControl() {
         this("Vertex A", "Vertex B", "Vertex C");
@@ -35,24 +35,15 @@ public class TriangleControl extends VBox implements ValueNode<Triangle> {
 
         value = new ReadOnlyObjectWrapper<>();
         addListener(value, newTriangle -> {
-            v0Spinner.setValue(newTriangle.getV0());
-            v1Spinner.setValue(newTriangle.getV1());
-            v2Spinner.setValue(newTriangle.getV2());
+            v0Spinner.valueProperty().bindBidirectional(newTriangle.v0Property());
+            v1Spinner.valueProperty().bindBidirectional(newTriangle.v1Property());
+            v2Spinner.valueProperty().bindBidirectional(newTriangle.v2Property());
         });
-
-        addListener(v0Spinner.valueProperty(),
-                newPoint -> value.get().setV0(newPoint));
-
-        addListener(v1Spinner.valueProperty(),
-                newPoint -> value.get().setV1(newPoint));
-
-        addListener(v2Spinner.valueProperty(),
-                newPoint -> value.get().setV2(newPoint));
     }
 
     @Override
-    public ObjectProperty<Triangle> valueProperty() {
-        return value;
+    public ReadOnlyObjectProperty<Triangle> valueProperty() {
+        return value.getReadOnlyProperty();
     }
 
     @Override
@@ -62,7 +53,7 @@ public class TriangleControl extends VBox implements ValueNode<Triangle> {
 
     @Override
     public void setValue(Triangle value) {
-        valueProperty().set(value);
+        this.value.set(value);
     }
 
 }
