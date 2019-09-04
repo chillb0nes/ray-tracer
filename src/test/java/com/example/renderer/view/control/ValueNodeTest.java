@@ -54,8 +54,7 @@ public class ValueNodeTest extends BaseJavaFXTest {
 
     @Test
     public void testMeshControl() {
-        Mesh value = new Mesh();
-        value.setTriangles(Arrays.asList(
+        Mesh value = new Mesh(
                 new Triangle(
                         new Point3D(1, 2, 3),
                         new Point3D(4, 5, 6),
@@ -66,7 +65,7 @@ public class ValueNodeTest extends BaseJavaFXTest {
                         new Point3D(-4, -5, -6),
                         new Point3D(-7, -8, -9)
                 )
-        ));
+        );
         MeshControl control = new MeshControl();
         control.setValue(value);
         assertEquals(value, control.getValue());

@@ -7,19 +7,41 @@ import javafx.geometry.Point3D;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Comparator.comparing;
 
 @Data
-@NoArgsConstructor
 public class Mesh extends Renderable {
 
     private Point3D center;
-    private List<Triangle> triangles = Lists.newArrayList();
+    private List<Triangle> triangles;
 
-    public Mesh(List<Triangle> triangles, Material material) {
+    public Mesh() {
+        triangles = Lists.newArrayList();
+    }
+
+    public Mesh(List<Triangle> triangles) {
         this.triangles = triangles;
+    }
+
+    public Mesh(Triangle... triangles) {
+        this.triangles = Arrays.asList(triangles);
+    }
+
+    public Mesh(Material material) {
+        this();
+        this.material = material;
+    }
+
+    public Mesh(Material material, List<Triangle> triangles) {
+        this(triangles);
+        this.material = material;
+    }
+
+    public Mesh(Material material, Triangle... triangles) {
+        this(triangles);
         this.material = material;
     }
 

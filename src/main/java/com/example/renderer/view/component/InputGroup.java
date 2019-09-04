@@ -28,7 +28,7 @@ public class InputGroup extends StackPane {
         groupLabel.getStyleClass().add("group-label");
         groupLabel.setStyle(
                 "-fx-background-color: -fx-background;" +
-                "-fx-text-fill: derive(-fx-box-border,-20%)");
+                "-fx-text-fill: derive(-fx-box-border, -20%)");
         groupLabel.setPadding(new Insets(3));
         groupLabel.translateYProperty().bind(heightProperty().add(PADDING / 2).divide(-2));
 
