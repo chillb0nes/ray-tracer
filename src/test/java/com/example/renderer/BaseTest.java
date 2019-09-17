@@ -1,5 +1,6 @@
 package com.example.renderer;
 
+import com.example.renderer.model.Material;
 import com.example.renderer.model.object.Mesh;
 import com.example.renderer.model.object.Triangle;
 import javafx.geometry.Point3D;
@@ -24,10 +25,15 @@ public class BaseTest {
 
     protected static Mesh randomMesh() {
         Mesh mesh = new Mesh();
-        for (int i = 0; i < random.nextInt(100) + 10; i++) {
-            mesh.getTriangles().add(randomTriangle());
-        }
+        randomLoop(10, () -> mesh.getTriangles().add(randomTriangle()));
+        mesh.setMaterial(Material.random());
         return mesh;
+    }
+
+    protected static void randomLoop(int min, Runnable runnable) {
+        for (int i = 0; i < random.nextInt(100) + min; i++) {
+            runnable.run();
+        }
     }
 
     protected static void assertDoubleEquals(double expected, double actual) {

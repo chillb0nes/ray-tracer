@@ -16,9 +16,11 @@ public class Triangle extends Renderable {
     private ObjectProperty<Point3D> v0;
     private ObjectProperty<Point3D> v1;
     private ObjectProperty<Point3D> v2;
-    private ReadOnlyObjectWrapper<Point3D> center;
+    private transient ReadOnlyObjectWrapper<Point3D> center;
 
-    public static final Triangle EMPTY = new Triangle(Point3D.ZERO, Point3D.ZERO, Point3D.ZERO);
+    public Triangle() {
+        this(Point3D.ZERO, Point3D.ZERO, Point3D.ZERO);
+    }
 
     public Triangle(Point3D v0, Point3D v1, Point3D v2) {
         this.v0 = new SimpleObjectProperty<>(v0);

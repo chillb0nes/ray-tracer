@@ -2,31 +2,30 @@ package com.example.renderer.model;
 
 import com.example.renderer.model.light.LightSource;
 import com.example.renderer.model.object.Renderable;
-import com.google.common.collect.Sets;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Point3D;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Data
 public class Scene {
-    public final static int DEFAULT_WIDTH = 640;
-    public final static int DEFAULT_HEIGHT = 480;
 
     private final int width;
     private final int height;
+
     private double fov;
     private boolean aaEnabled;
-
     private Point3D cameraOrigin;
+
     private Set<Renderable> objects;
     private Set<LightSource> lights;
-    @EqualsAndHashCode.Exclude
-    private Set<Renderable> selected;
+
+    private transient Set<Renderable> selected;
+
+    public Scene() {
+        this(640, 480);
+    }
 
     public Scene(int width, int height) {
         this.width = width;
@@ -50,7 +49,7 @@ public class Scene {
         return aaEnabled ? height * 2 : height;
     }
 
-    /*public void addObject(Renderable object) {
+    public void addObject(Renderable object) {
         objects.add(object);
     }
 
@@ -64,5 +63,5 @@ public class Scene {
 
     public void removeLight(LightSource light) {
         lights.remove(light);
-    }*/
+    }
 }

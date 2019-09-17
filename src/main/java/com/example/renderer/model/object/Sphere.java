@@ -3,11 +3,13 @@ package com.example.renderer.model.object;
 import com.example.renderer.model.Material;
 import com.example.renderer.model.RayHit;
 import javafx.geometry.Point3D;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import static java.lang.Math.sqrt;
 
 @Data
+@AllArgsConstructor
 public class Sphere extends Renderable {
 
     private Point3D center;

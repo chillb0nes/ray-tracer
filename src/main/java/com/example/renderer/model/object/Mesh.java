@@ -18,7 +18,7 @@ import static java.util.Comparator.comparing;
 public class Mesh extends Renderable {
 
     private ObservableList<Triangle> triangles;
-    private ReadOnlyObjectWrapper<Point3D> center;
+    private transient ReadOnlyObjectWrapper<Point3D> center;
 
     public Mesh() {
         triangles = FXCollections.observableArrayList();
@@ -38,16 +38,24 @@ public class Mesh extends Renderable {
     public Mesh(Material material) {
         this();
         this.material = material;
+        bindMaterial();
     }
 
     public Mesh(Material material, List<Triangle> triangles) {
         this(triangles);
         this.material = material;
+        bindMaterial();
     }
 
     public Mesh(Material material, Triangle... triangles) {
         this(triangles);
         this.material = material;
+        bindMaterial();
+    }
+
+    public void setTriangles(ObservableList<Triangle> triangles) {
+        this.triangles = triangles;
+        bindCenter();
     }
 
     private void bindCenter() {
@@ -59,6 +67,10 @@ public class Mesh extends Renderable {
             }
             return sum.multiply(1. / triangles.size());
         }, triangles));
+    }
+
+    private void bindMaterial() {
+        triangles.forEach(triangle -> triangle.setMaterial(material));
     }
 
     @Override

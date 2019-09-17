@@ -92,7 +92,7 @@ public class UIController {
 
     @FXML
     public void initialize() {
-        scene = new Scene(Scene.DEFAULT_WIDTH, Scene.DEFAULT_HEIGHT);
+        scene = new Scene();
         sceneObjects = FXCollections.observableArrayList();
 
         modalService = new ModalService();

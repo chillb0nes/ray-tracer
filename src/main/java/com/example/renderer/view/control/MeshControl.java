@@ -35,7 +35,7 @@ public class MeshControl extends VBox implements ValueNode<Mesh> {
         mesh.setTriangles(listView.getItems());
 
         addButton = new Button("Add");
-        addButton.setOnAction(event -> listView.getItems().add(Triangle.EMPTY));
+        addButton.setOnAction(event -> listView.getItems().add(new Triangle()));
         addButton.setMaxWidth(Double.MAX_VALUE);
 
         double fontSize = addButton.getFont().getSize();
