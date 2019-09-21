@@ -4,8 +4,9 @@ import com.example.renderer.model.Material;
 import com.example.renderer.model.Scene;
 import com.example.renderer.model.light.LightSource;
 import com.example.renderer.model.object.*;
-import com.example.renderer.service.ModalService;
+import com.example.renderer.service.DialogFactory;
 import com.example.renderer.service.RenderService;
+import com.example.renderer.service.SerializationService;
 import com.example.renderer.view.component.InputGroup;
 import com.example.renderer.view.component.ScrollablePane;
 import com.example.renderer.view.control.Point3DSpinner;
@@ -86,7 +87,7 @@ public class UIController {
     private Scene scene;
     private ObservableList<Object3D> sceneObjects;
     private RenderService renderService;
-    private ModalService modalService;
+    private DialogFactory dialogFactory;
     private Stage stage;
     private Timeline errorBoxAnimation;
 
@@ -94,8 +95,6 @@ public class UIController {
     public void initialize() {
         scene = new Scene();
         sceneObjects = FXCollections.observableArrayList();
-
-        modalService = new ModalService();
 
         renderService = new RenderService();
         renderService.setExecutor(Executors.newSingleThreadExecutor());
@@ -142,9 +141,13 @@ public class UIController {
         });
 
         errorBoxAnimation = slideFromTopAnimation();
+
+        //todo
+        meshItem.setUserData(Mesh.class);
     }
 
     public void setUp() {
+        dialogFactory = new DialogFactory(stage, new SerializationService());
         hideErrorBox();
         resetFocus();
     }
@@ -201,7 +204,7 @@ public class UIController {
 
     public void editObject() {
         Object3D selectedItem = objectList.getSelectionModel().getSelectedItem();
-        Stage editDialog = modalService.createEditModal(selectedItem, stage);
+        Dialog<Object3D> editDialog = dialogFactory.createEditDialog(selectedItem);
         editDialog.show();
     }
 
