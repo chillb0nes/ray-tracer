@@ -39,6 +39,13 @@ public class TriangleControl extends VBox implements ValueNode<Triangle> {
             v1Spinner.valueProperty().bindBidirectional(newTriangle.v1Property());
             v2Spinner.valueProperty().bindBidirectional(newTriangle.v2Property());
         });
+
+        setDefaultValue();
+    }
+
+    @Override
+    public Triangle getDefaultValue() {
+        return new Triangle();
     }
 
     @Override

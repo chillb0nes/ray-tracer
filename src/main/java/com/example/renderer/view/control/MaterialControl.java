@@ -7,7 +7,6 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import lombok.Getter;
 
 import static com.example.renderer.view.util.ObservableUtils.addListener;
@@ -24,7 +23,7 @@ public class MaterialControl extends VBox implements ValueNode<Material> {
     private ObjectProperty<Material> value;
 
     public MaterialControl() {
-        colorPicker = new ColorPicker(Color.WHITE);
+        colorPicker = new ColorPicker();
         colorPicker.prefWidthProperty().bind(widthProperty());
 
         diffuseSpinner = new DoubleSpinner();
@@ -51,7 +50,7 @@ public class MaterialControl extends VBox implements ValueNode<Material> {
                 iorSpinner
         );
 
-        value = new ReadOnlyObjectWrapper<>(Material.builder().build());
+        value = new ReadOnlyObjectWrapper<>();
         addListener(value, newMaterial -> {
             colorPicker.setValue(newMaterial.getColor());
             diffuseSpinner.setValue(newMaterial.getDiffuse());
@@ -82,6 +81,13 @@ public class MaterialControl extends VBox implements ValueNode<Material> {
 
         addListener(iorSpinner.valueProperty(),
                 newValue -> value.get().setIor(newValue));
+
+        setDefaultValue();
+    }
+
+    @Override
+    public Material getDefaultValue() {
+        return Material.DEFAULT;
     }
 
     @Override

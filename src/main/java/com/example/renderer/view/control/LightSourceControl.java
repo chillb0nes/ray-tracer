@@ -4,6 +4,7 @@ import com.example.renderer.model.light.LightSource;
 import com.example.renderer.view.component.ValueNode;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.geometry.Point3D;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import lombok.Getter;
@@ -40,6 +41,13 @@ public class LightSourceControl extends VBox implements ValueNode<LightSource> {
 
         addListener(intensitySpinner.valueProperty(),
                 newValue -> value.get().setIntensity(newValue));
+
+        setDefaultValue();
+    }
+
+    @Override
+    public LightSource getDefaultValue() {
+        return new LightSource(Point3D.ZERO, 0);
     }
 
     @Override

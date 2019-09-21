@@ -31,7 +31,7 @@ public class Point3DSpinner extends HBox implements ValueNode<Point3D> {
         );
         //setSpacing(-1);
 
-        value = new ReadOnlyObjectWrapper<>(Point3D.ZERO);
+        value = new ReadOnlyObjectWrapper<>();
         addListener(value, newPoint -> {
             xSpinner.getValueFactory().setValue(newPoint.getX());
             ySpinner.getValueFactory().setValue(newPoint.getY());
@@ -55,6 +55,13 @@ public class Point3DSpinner extends HBox implements ValueNode<Point3D> {
             Point3D newPoint = new Point3D(oldPoint.getX(), oldPoint.getY(), newZ);
             value.set(newPoint);
         });
+
+        setDefaultValue();
+    }
+
+    @Override
+    public Point3D getDefaultValue() {
+        return Point3D.ZERO;
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.example.renderer.model.object.Sphere;
 import com.example.renderer.view.component.ValueNode;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.geometry.Point3D;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import lombok.Getter;
@@ -40,6 +41,13 @@ public class SphereControl extends VBox implements ValueNode<Sphere> {
 
         addListener(radiusSpinner.valueProperty(),
                 newRadius -> value.get().setRadius(newRadius));
+
+        setDefaultValue();
+    }
+
+    @Override
+    public Sphere getDefaultValue() {
+        return new Sphere(Point3D.ZERO, 0);
     }
 
     @Override

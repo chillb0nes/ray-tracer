@@ -10,4 +10,12 @@ public interface ValueNode<V> {
 
     void setValue(V value);
 
+    default V getDefaultValue() {
+        return null;
+    }
+
+    default void setDefaultValue() {
+        setValue(getDefaultValue());
+    }
+
 }

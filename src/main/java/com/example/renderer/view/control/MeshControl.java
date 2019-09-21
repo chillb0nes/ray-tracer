@@ -42,6 +42,13 @@ public class MeshControl extends VBox implements ValueNode<Mesh> {
         addButton.setGraphic(Icon.ADD.withSize(fontSize));
 
         getChildren().addAll(listView, addButton);
+
+        setDefaultValue();
+    }
+
+    @Override
+    public Mesh getDefaultValue() {
+        return new Mesh();
     }
 
     @Override

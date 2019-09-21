@@ -32,6 +32,7 @@ public class Triangle extends Renderable {
     public Triangle(Point3D v0, Point3D v1, Point3D v2, Material material) {
         this(v0, v1, v2);
         this.material = material;
+        bindCenter();
     }
 
     private void bindCenter() {

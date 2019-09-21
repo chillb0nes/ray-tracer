@@ -18,6 +18,7 @@ public class ValueNodeTest extends BaseJavaFXTest {
     public void testDoubleSpinner() {
         double value = 0.5;
         DoubleSpinner control = new DoubleSpinner();
+        assertDoubleEquals(0, control.getValue());
         control.setValue(value);
         assertDoubleEquals(value, control.getValue());
     }
@@ -26,6 +27,11 @@ public class ValueNodeTest extends BaseJavaFXTest {
     public void testPoint3DSpinner() {
         Point3D value = randomPoint3D();
         Point3DSpinner control = new Point3DSpinner();
+
+        assertDoubleEquals(control.getDefaultValue().getX(), control.getXSpinner().getValue());
+        assertDoubleEquals(control.getDefaultValue().getY(), control.getYSpinner().getValue());
+        assertDoubleEquals(control.getDefaultValue().getZ(), control.getZSpinner().getValue());
+
         control.setValue(value);
         assertPoint3DEquals(value, control.getValue());
 
@@ -38,6 +44,11 @@ public class ValueNodeTest extends BaseJavaFXTest {
     public void testTriangleControl() {
         Triangle value = randomTriangle();
         TriangleControl control = new TriangleControl();
+
+        assertEquals(control.getDefaultValue().getV0(), control.getV0Spinner().getValue());
+        assertEquals(control.getDefaultValue().getV1(), control.getV1Spinner().getValue());
+        assertEquals(control.getDefaultValue().getV2(), control.getV2Spinner().getValue());
+
         control.setValue(value);
         assertEquals(value, control.getValue());
 
@@ -50,6 +61,9 @@ public class ValueNodeTest extends BaseJavaFXTest {
     public void testMeshControl() {
         Mesh value = randomMesh();
         MeshControl control = new MeshControl();
+
+        assertTrue(control.getListView().getItems().containsAll(control.getDefaultValue().getTriangles()));
+
         control.setValue(value);
         assertEquals(value, control.getValue());
 
@@ -60,6 +74,10 @@ public class ValueNodeTest extends BaseJavaFXTest {
     public void testSphereControl() {
         Sphere value = new Sphere(randomPoint3D(), 1, null);
         SphereControl control = new SphereControl();
+
+        assertPoint3DEquals(control.getDefaultValue().getCenter(), control.getCenterSpinner().getValue());
+        assertDoubleEquals(control.getDefaultValue().getRadius(), control.getRadiusSpinner().getValue());
+
         control.setValue(value);
         assertEquals(value, control.getValue());
 
@@ -71,6 +89,10 @@ public class ValueNodeTest extends BaseJavaFXTest {
     public void testLightSourceControl() {
         LightSource value = new LightSource(randomPoint3D(), 0.5);
         LightSourceControl control = new LightSourceControl();
+
+        assertPoint3DEquals(control.getDefaultValue().getCenter(), control.getCenterSpinner().getValue());
+        assertDoubleEquals(control.getDefaultValue().getIntensity(), control.getIntensitySpinner().getValue());
+
         control.setValue(value);
         assertEquals(value, control.getValue());
 
@@ -90,6 +112,15 @@ public class ValueNodeTest extends BaseJavaFXTest {
                 .ior(0.6)
                 .build();
         MaterialControl control = new MaterialControl();
+
+        assertEquals(control.getDefaultValue().getColor(), control.getColorPicker().getValue());
+        assertDoubleEquals(control.getDefaultValue().getDiffuse(), control.getDiffuseSpinner().getValue());
+        assertDoubleEquals(control.getDefaultValue().getSpecular(), control.getSpecularSpinner().getValue());
+        assertDoubleEquals(control.getDefaultValue().getReflectivity(), control.getReflectivitySpinner().getValue());
+        assertDoubleEquals(control.getDefaultValue().getTransmittance(), control.getTransmittanceSpinner().getValue());
+        assertDoubleEquals(control.getDefaultValue().getSpecularExp(), control.getSpecularExpSpinner().getValue());
+        assertDoubleEquals(control.getDefaultValue().getIor(), control.getIorSpinner().getValue());
+
         control.setValue(value);
         assertEquals(value, control.getValue());
 
