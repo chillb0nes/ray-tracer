@@ -13,7 +13,6 @@ import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +20,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import static com.example.renderer.view.util.ObservableUtils.onLayoutDone;
 
 public abstract class CustomDialog<T extends Object3D> extends Dialog<T> {
 
@@ -74,17 +75,11 @@ public abstract class CustomDialog<T extends Object3D> extends Dialog<T> {
             content.getChildren().add(new InputGroup("Material parameters", (Node) materialControl));
         }
         content.setSpacing(10);
-        removeBottomPadding(content);
+        onLayoutDone(content, () -> {
+            Insets padding = content.getPadding();
+            content.setPadding(new Insets(padding.getTop(), padding.getRight(), 0, padding.getLeft()));
+        });
         return content;
-    }
-
-    private void removeBottomPadding(Region region) {
-        region.needsLayoutProperty().addListener(((observable, layoutDone, needsLayout) -> {
-            if (layoutDone) {
-                Insets padding = region.getPadding();
-                region.setPadding(new Insets(padding.getTop(), padding.getRight(), 0, padding.getLeft()));
-            }
-        }));
     }
 
     protected String getPrettyClassName() {

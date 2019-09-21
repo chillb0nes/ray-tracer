@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import static com.example.renderer.view.util.ObservableUtils.addListener;
+import static com.example.renderer.view.util.ObservableUtils.onLayoutDone;
 import static javafx.geometry.Pos.CENTER;
 
 public class ExpandableListView<T> extends ListView<T> {
@@ -85,16 +86,14 @@ public class ExpandableListView<T> extends ListView<T> {
         header.setMinWidth(USE_PREF_SIZE);
         BorderPane.setAlignment(deleteButton, CENTER);
 
-        header.needsLayoutProperty().addListener(((observable, layoutDone, needsLayout) -> {
-            if (layoutDone) {
-                Region arrowButton = (Region) titledPane.lookup(".arrow-button");
-                header.prefWidthProperty().bind(titledPane.widthProperty()
-                        .subtract(arrowButton.getWidth())
-                        .subtract(arrowButton.getLayoutX())
-                        .subtract(arrowButton.getPadding().getRight())
-                        .subtract(2));
-            }
-        }));
+        onLayoutDone(header, () -> {
+            Region arrowButton = (Region) titledPane.lookup(".arrow-button");
+            header.prefWidthProperty().bind(titledPane.widthProperty()
+                    .subtract(arrowButton.getWidth())
+                    .subtract(arrowButton.getLayoutX())
+                    .subtract(arrowButton.getPadding().getRight())
+                    .subtract(2));
+        });
 
         titledPane.setGraphic(header);
         titledPane.setMinWidth(USE_PREF_SIZE);
