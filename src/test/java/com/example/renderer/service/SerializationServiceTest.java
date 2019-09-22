@@ -75,7 +75,7 @@ public class SerializationServiceTest extends BaseTest {
             renderable.setMaterial(Material.random());
             scene.addObject(renderable);
         });
-        randomLoop(0, () -> scene.addLight(new LightSource(randomPoint3D(), random.nextDouble())));
+        randomLoop(0, () -> scene.addObject(new LightSource(randomPoint3D(), random.nextDouble())));
         assertEquals(scene, serializationService.copy(scene));
     }
 

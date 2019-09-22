@@ -39,6 +39,13 @@ public class SerializationService {
                     jsonObject.addProperty("z", point3D.getZ());
                     return jsonObject;
                 })
+                .registerTypeAdapter(Point3D.class, (JsonDeserializer<Point3D>) (jsonElement, type, ctx) -> {
+                    JsonObject jsonObject = jsonElement.getAsJsonObject();
+                    double x = jsonObject.getAsJsonPrimitive("x").getAsDouble();
+                    double y = jsonObject.getAsJsonPrimitive("y").getAsDouble();
+                    double z = jsonObject.getAsJsonPrimitive("z").getAsDouble();
+                    return new Point3D(x, y, z);
+                })
                 .setPrettyPrinting()
                 .create();
     }

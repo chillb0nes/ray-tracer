@@ -44,7 +44,7 @@
         </StackPane>
         <VBox fx:id="sidebar" alignment="TOP_CENTER" prefHeight="480.0" spacing="15.0">
             <children>
-                <InputGroup spacing="0" title="Camera controls">
+                <InputGroup spacing="2" title="Camera controls">
                     <children>
                         <AnchorPane>
                             <Label text="FOV:" />
@@ -53,6 +53,7 @@
                         <ScrollablePane fx:id="sliderArea">
                             <Slider fx:id="fovSlider" blockIncrement="7.5" majorTickUnit="15.0" max="90" minorTickCount="1" showTickMarks="true" snapToTicks="true" />
                         </ScrollablePane>
+                        <Point3DSpinner fx:id="cameraOriginSpinner"/>
                     </children>
                 </InputGroup>
                 <InputGroup fx:id="sceneControls" title="Scene controls">
@@ -79,9 +80,10 @@
                         <Point3DSpinner fx:id="objectPosition" />
                         <MenuButton fx:id="newObjectBtn" mnemonicParsing="false" popupSide="LEFT" text="New object">
                             <items>
-                                <MenuItem fx:id="sphereItem" mnemonicParsing="false" text="Sphere" />
-                                <MenuItem fx:id="polygonItem" mnemonicParsing="false" text="Polygon" />
-                                <MenuItem fx:id="meshItem" mnemonicParsing="false" text="Mesh" />
+                                <MenuItem fx:id="sphereItem" mnemonicParsing="false" text="Sphere" onAction="#newObject"/>
+                                <MenuItem fx:id="triangleItem" mnemonicParsing="false" text="Triangle" onAction="#newObject"/>
+                                <MenuItem fx:id="meshItem" mnemonicParsing="false" text="Mesh" onAction="#newObject"/>
+                                <MenuItem fx:id="lightSourceItem" mnemonicParsing="false" text="Light Source" onAction="#newObject"/>
                             </items>
                         </MenuButton>
                         <CheckBox fx:id="aaCheckBox" mnemonicParsing="false" text="Enable antialiasing" />

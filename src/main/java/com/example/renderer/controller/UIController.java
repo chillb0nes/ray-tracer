@@ -3,14 +3,16 @@ package com.example.renderer.controller;
 import com.example.renderer.model.Material;
 import com.example.renderer.model.Scene;
 import com.example.renderer.model.light.LightSource;
-import com.example.renderer.model.object.*;
+import com.example.renderer.model.object.Mesh;
+import com.example.renderer.model.object.Object3D;
+import com.example.renderer.model.object.Sphere;
+import com.example.renderer.model.object.Triangle;
 import com.example.renderer.service.DialogFactory;
 import com.example.renderer.service.RenderService;
 import com.example.renderer.service.SerializationService;
 import com.example.renderer.view.component.InputGroup;
 import com.example.renderer.view.component.ScrollablePane;
 import com.example.renderer.view.control.Point3DSpinner;
-import com.google.common.collect.ImmutableSet;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -18,6 +20,7 @@ import javafx.animation.Timeline;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.geometry.Point3D;
 import javafx.scene.control.*;
@@ -31,12 +34,13 @@ import javafx.util.Duration;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.logging.log4j.ThreadContext;
 
-import java.util.Collections;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+
+import static com.example.renderer.view.util.ObservableUtils.addListener;
 
 @Log4j2
 @Setter
@@ -54,6 +58,8 @@ public class UIController {
     @FXML
     private Slider fovSlider;
     @FXML
+    private Point3DSpinner cameraOriginSpinner;
+    @FXML
     private InputGroup sceneControls;
     @FXML
     private Button importBtn;
@@ -68,9 +74,11 @@ public class UIController {
     @FXML
     private MenuItem sphereItem;
     @FXML
-    private MenuItem polygonItem;
+    private MenuItem triangleItem;
     @FXML
     private MenuItem meshItem;
+    @FXML
+    private MenuItem lightSourceItem;
     @FXML
     private CheckBox aaCheckBox;
     @FXML
@@ -94,31 +102,37 @@ public class UIController {
     @FXML
     public void initialize() {
         scene = new Scene();
-        sceneObjects = FXCollections.observableArrayList();
 
-        renderService = new RenderService();
-        renderService.setExecutor(Executors.newSingleThreadExecutor());
+        renderService = new RenderService();//todo DI
         renderService.setOnRunning(e -> {
             loader.setVisible(true);
+            ThreadContext.push(String.valueOf(System.currentTimeMillis()));
         });
         renderService.setOnSucceeded(e -> {
             image.setImage(renderService.getValue());
             loader.setVisible(false);
+            log.trace("Image is rendered in {}ms", () -> {
+                String start = ThreadContext.pop();
+                return System.currentTimeMillis() - Long.parseLong(start);
+            });
             renderService.reset();
         });
+
+        cameraOriginSpinner.valueProperty().bindBidirectional(scene.cameraOriginProperty());
+        addListener(cameraOriginSpinner.valueProperty(), newValue -> update());
 
         fovSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             double increment = fovSlider.getBlockIncrement();
             double value = Math.round(newValue.doubleValue() / increment) * increment;
             fovSlider.setValue(value);
-            fovLabel.setText(String.format(Locale.US, "%.1f", value));
-            scene.setFov(value);
             update();
         });
+        fovLabel.textProperty().bind(fovSlider.valueProperty().asString(Locale.US, "%.1f"));
+        fovSlider.valueProperty().bindBidirectional(scene.fovProperty());
         fovSlider.setValue(45);
 
-        /*imageArea.setOnScrollEnded(this::changeFovValue);
-        sliderArea.setOnScrollEnded(this::changeFovValue);*/
+        //fovSlider.setOnScroll(this::changeFovValue);
+        //sliderArea.setOnScrollEnded(scrollEvent -> Platform.runLater(this::update));
 
         ReadOnlyDoubleProperty widthProperty = objectPosition.widthProperty();
         objectList.prefWidthProperty().bind(widthProperty);
@@ -128,56 +142,38 @@ public class UIController {
         aaCheckBox.prefWidthProperty().bind(widthProperty);
         saveBtn.prefWidthProperty().bind(sceneControls.widthProperty());
 
-        objectList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue instanceof Renderable) {
-                //scene.setSelected(ImmutableSet.of((Renderable) newValue));
-                //`update();
-            }
-        });
-
-        aaCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            scene.setAaEnabled(newValue);
-            update();
-        });
+        aaCheckBox.selectedProperty().bindBidirectional(scene.aaEnabledProperty());
 
         errorBoxAnimation = slideFromTopAnimation();
 
-        //todo
+        sphereItem.setUserData(Sphere.class);
+        triangleItem.setUserData(Triangle.class);
         meshItem.setUserData(Mesh.class);
+        lightSourceItem.setUserData(LightSource.class);
     }
 
     public void setUp() {
-        dialogFactory = new DialogFactory(stage, new SerializationService());
+        dialogFactory = new DialogFactory(stage, new SerializationService());//todo DI
         hideErrorBox();
         resetFocus();
     }
 
-    private void updateCamera(Double x, Double y, Double z) {
-        if (x == null) x = scene.getCameraOrigin().getX();
-        if (y == null) y = scene.getCameraOrigin().getY();
-        if (z == null) z = scene.getCameraOrigin().getZ();
-
-        scene.setCameraOrigin(new Point3D(x, y, z));
-    }
-
     public void updateModel() {
         generateModel();
-
-        sceneObjects.clear();
-        sceneObjects.addAll(scene.getObjects());
-        sceneObjects.addAll(scene.getLights());
-
-        objectList.setItems(sceneObjects);
         update();
     }
 
     private void update() {
+        sceneObjects.clear();
+        sceneObjects.addAll(scene.getObjects());
+        sceneObjects.addAll(scene.getLights());
+        objectList.setItems(sceneObjects);
         renderService.render(scene);
     }
 
     public void resetFocus() {
         objectList.getSelectionModel().clearSelection();
-        scene.setSelected(Collections.emptySet());
+        scene.getSelected().clear();
         root.requestFocus();
     }
 
@@ -187,7 +183,6 @@ public class UIController {
         } else {
             fovSlider.decrement();
         }
-        update();
     }
 
     public void importScene() {
@@ -202,10 +197,26 @@ public class UIController {
         throw new UnsupportedOperationException("saveImage not implemented");
     }
 
+    @SuppressWarnings("unchecked")
+    public void newObject(Event event) {
+        MenuItem menuItem = (MenuItem) event.getSource();
+        Class<Object3D> userData = (Class<Object3D>) menuItem.getUserData();
+        Dialog<Object3D> newDialog = dialogFactory.createNewDialog(userData);
+        Optional<Object3D> result = newDialog.showAndWait();
+        result.ifPresent(object3D -> {
+            scene.addObject(object3D);
+            update();
+        });
+    }
+
     public void editObject() {
         Object3D selectedItem = objectList.getSelectionModel().getSelectedItem();
         Dialog<Object3D> editDialog = dialogFactory.createEditDialog(selectedItem);
-        editDialog.show();
+        Optional<Object3D> result = editDialog.showAndWait();
+        result.ifPresent(object3D -> {
+            scene.updateObject(selectedItem, object3D);
+            update();
+        });
     }
 
     public void closeErrorBox() {
@@ -244,11 +255,8 @@ public class UIController {
         log.debug("Mouse click at {}:{}", (int) e.getSceneX(), (int) e.getSceneY());
     }
 
-    public void shutdown() {
-        ((ExecutorService) renderService.getExecutor()).shutdownNow();
-    }
-
     private void generateModel() {
+        scene.getObjects().clear();
         Random random = new Random();
         Sphere sphere1 = new Sphere(new Point3D(0, -1, -7), 0.5, Material.random());
 
@@ -283,13 +291,15 @@ public class UIController {
 
         Mesh mesh1 = new Mesh();
 
-        scene.setObjects(ImmutableSet.of(sphere1, sphere2, sphere3, sphere4, sphere5, sphere6, sphere7, sphere8,
-                triangle1, triangle2, triangle3, mesh1));
+        scene.getObjects().setAll(
+                sphere1, sphere2, sphere3, sphere4, sphere5, sphere6, sphere7, sphere8,
+                triangle1, triangle2, triangle3,
+                mesh1);
 
-        LightSource light1 = new LightSource(new Point3D(0, 5, 5), random.nextDouble() * 2);
-        LightSource light2 = new LightSource(new Point3D(-2, 2, 2), random.nextDouble() * 2);
-        LightSource light3 = new LightSource(new Point3D(5, 1, 0), random.nextDouble() * 2);
+        LightSource light1 = new LightSource(new Point3D(0, 5, 5), random.nextDouble());
+        LightSource light2 = new LightSource(new Point3D(-2, 2, 2), random.nextDouble());
+        LightSource light3 = new LightSource(new Point3D(5, 1, 0), random.nextDouble());
 
-        scene.setLights(ImmutableSet.of(light1, light2, light3));
+        scene.getLights().setAll(light1, light2, light3);
     }
 }

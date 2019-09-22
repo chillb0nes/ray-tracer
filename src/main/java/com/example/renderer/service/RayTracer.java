@@ -5,6 +5,7 @@ import com.example.renderer.model.RayHit;
 import com.example.renderer.model.Scene;
 import com.example.renderer.model.light.LightSource;
 import com.example.renderer.model.object.Renderable;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.geometry.Point3D;
 import javafx.scene.image.Image;
@@ -12,7 +13,6 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -79,7 +79,7 @@ public class RayTracer {
     }
 
     private Color drawOutline(int i, int j) {
-        Set<Renderable> selected = scene.getSelected();
+        ObservableList<Renderable> selected = scene.getSelected();
         double x = cameraX(i);
         double y = cameraY(j);
 
