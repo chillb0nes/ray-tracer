@@ -59,6 +59,12 @@ public class Scene {
         }
     }
 
+    public void addObjects(Object3D... objects3D) {
+        for (Object3D object3D : objects3D) {
+            addObject(object3D);
+        }
+    }
+
     public void updateObject(Object3D oldValue, Object3D newValue) {
         Preconditions.checkArgument(oldValue.getClass() == newValue.getClass());
         if (oldValue instanceof Renderable) {
@@ -68,6 +74,15 @@ public class Scene {
         if (oldValue instanceof LightSource) {
             Preconditions.checkArgument(lights.contains(oldValue));
             lights.set(lights.indexOf(oldValue), (LightSource) newValue);
+        }
+    }
+
+    public void deleteObject(Object3D object3D) {
+        if (object3D instanceof Renderable) {
+            objects.remove(object3D);
+        }
+        if (object3D instanceof LightSource) {
+            lights.remove(object3D);
         }
     }
 

@@ -14,6 +14,7 @@
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -53,7 +54,7 @@
                         <ScrollablePane fx:id="sliderArea">
                             <Slider fx:id="fovSlider" blockIncrement="7.5" majorTickUnit="15.0" max="90" minorTickCount="1" showTickMarks="true" snapToTicks="true" />
                         </ScrollablePane>
-                        <Point3DSpinner fx:id="cameraOriginSpinner"/>
+                        <Point3DSpinner fx:id="cameraOriginSpinner" />
                     </children>
                 </InputGroup>
                 <InputGroup fx:id="sceneControls" title="Scene controls">
@@ -69,8 +70,9 @@
                                     <contextMenu>
                                         <ContextMenu>
                                             <items>
+                                                <SeparatorMenuItem mnemonicParsing="false" />
                                                 <MenuItem onAction="#editObject" text="Edit" />
-                                                <MenuItem onAction="#editObject" text="Delete" />
+                                                <MenuItem onAction="#deleteObject" text="Delete" />
                                             </items>
                                         </ContextMenu>
                                     </contextMenu>

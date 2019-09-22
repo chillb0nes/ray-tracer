@@ -47,7 +47,7 @@ public class SphereControl extends VBox implements ValueNode<Sphere> {
 
     @Override
     public Sphere getDefaultValue() {
-        return new Sphere(Point3D.ZERO, 0);
+        return new Sphere(Point3D.ZERO, 1);
     }
 
     @Override

@@ -102,6 +102,8 @@ public class UIController {
     @FXML
     public void initialize() {
         scene = new Scene();
+        addSceneListeners();
+        sceneObjects = FXCollections.observableArrayList();
 
         renderService = new RenderService();//todo DI
         renderService.setOnRunning(e -> {
@@ -118,21 +120,18 @@ public class UIController {
             renderService.reset();
         });
 
-        cameraOriginSpinner.valueProperty().bindBidirectional(scene.cameraOriginProperty());
-        addListener(cameraOriginSpinner.valueProperty(), newValue -> update());
-
+        fovSlider.valueProperty().bindBidirectional(scene.fovProperty());
         fovSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             double increment = fovSlider.getBlockIncrement();
             double value = Math.round(newValue.doubleValue() / increment) * increment;
             fovSlider.setValue(value);
-            update();
         });
-        fovLabel.textProperty().bind(fovSlider.valueProperty().asString(Locale.US, "%.1f"));
-        fovSlider.valueProperty().bindBidirectional(scene.fovProperty());
         fovSlider.setValue(45);
+        fovLabel.textProperty().bind(fovSlider.valueProperty().asString(Locale.US, "%.1f"));
 
-        //fovSlider.setOnScroll(this::changeFovValue);
-        //sliderArea.setOnScrollEnded(scrollEvent -> Platform.runLater(this::update));
+        cameraOriginSpinner.valueProperty().bindBidirectional(scene.cameraOriginProperty());
+
+        fovSlider.setOnScroll(this::changeFovValue);
 
         ReadOnlyDoubleProperty widthProperty = objectPosition.widthProperty();
         objectList.prefWidthProperty().bind(widthProperty);
@@ -141,6 +140,16 @@ public class UIController {
         newObjectBtn.prefWidthProperty().bind(widthProperty);
         aaCheckBox.prefWidthProperty().bind(widthProperty);
         saveBtn.prefWidthProperty().bind(sceneControls.widthProperty());
+
+        addListener(objectPosition.valueProperty(), newValue -> {
+            objectList.getSelectionModel().getSelectedItem().setCenter(newValue);
+            update();
+        });
+        addListener(objectList.getSelectionModel().selectedItemProperty(), newItem -> {
+            if (newItem != null) {
+                objectPosition.setValue(newItem.getCenter());
+            }
+        });
 
         aaCheckBox.selectedProperty().bindBidirectional(scene.aaEnabledProperty());
 
@@ -152,6 +161,15 @@ public class UIController {
         lightSourceItem.setUserData(LightSource.class);
     }
 
+    private void addSceneListeners() {
+        addListener(scene.fovProperty(), newValue -> update());
+        addListener(scene.aaEnabledProperty(), newValue -> update());
+        addListener(scene.cameraOriginProperty(), newValue -> update());
+        addListener(scene.getObjects(), change -> update());
+        addListener(scene.getLights(), change -> update());
+        addListener(scene.getSelected(), change -> update());
+    }
+
     public void setUp() {
         dialogFactory = new DialogFactory(stage, new SerializationService());//todo DI
         hideErrorBox();
@@ -160,7 +178,6 @@ public class UIController {
 
     public void updateModel() {
         generateModel();
-        update();
     }
 
     private void update() {
@@ -203,20 +220,19 @@ public class UIController {
         Class<Object3D> userData = (Class<Object3D>) menuItem.getUserData();
         Dialog<Object3D> newDialog = dialogFactory.createNewDialog(userData);
         Optional<Object3D> result = newDialog.showAndWait();
-        result.ifPresent(object3D -> {
-            scene.addObject(object3D);
-            update();
-        });
+        result.ifPresent(object3D -> scene.addObject(object3D));
     }
 
     public void editObject() {
         Object3D selectedItem = objectList.getSelectionModel().getSelectedItem();
         Dialog<Object3D> editDialog = dialogFactory.createEditDialog(selectedItem);
         Optional<Object3D> result = editDialog.showAndWait();
-        result.ifPresent(object3D -> {
-            scene.updateObject(selectedItem, object3D);
-            update();
-        });
+        result.ifPresent(object3D -> scene.updateObject(selectedItem, object3D));
+    }
+
+    public void deleteObject() {
+        Object3D selectedItem = objectList.getSelectionModel().getSelectedItem();
+        scene.deleteObject(selectedItem);
     }
 
     public void closeErrorBox() {
