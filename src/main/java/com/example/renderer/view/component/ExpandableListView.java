@@ -59,7 +59,7 @@ public class ExpandableListView<T> extends ListView<T> {
                 .multiply(cellSize.getHeight())
                 .greaterThan(heightProperty());
 
-        cellWidthProperty = new When(scrollBarVisible)
+        cellWidthProperty = Bindings.when(scrollBarVisible)
                 .then(cellSize.getWidth() - getScrollBarWidth())
                 .otherwise(cellSize.getWidth());
 

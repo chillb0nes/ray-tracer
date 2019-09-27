@@ -79,7 +79,7 @@
                                 </ListView>
                             </children>
                         </FlowPane>
-                        <Point3DSpinner fx:id="objectPosition" />
+                        <Point3DSpinner fx:id="objectPosition" disable="true"/>
                         <MenuButton fx:id="newObjectBtn" mnemonicParsing="false" popupSide="LEFT" text="New object">
                             <items>
                                 <MenuItem fx:id="sphereItem" mnemonicParsing="false" text="Sphere" onAction="#newObject"/>

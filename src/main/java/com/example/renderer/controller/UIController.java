@@ -93,6 +93,7 @@ public class UIController {
     private Label errorBoxText;
 
     private Scene scene;
+    private MultipleSelectionModel<Object3D> selectionModel;
     private ObservableList<Object3D> sceneObjects;
     private RenderService renderService;
     private DialogFactory dialogFactory;
@@ -141,15 +142,9 @@ public class UIController {
         aaCheckBox.prefWidthProperty().bind(widthProperty);
         saveBtn.prefWidthProperty().bind(sceneControls.widthProperty());
 
-        addListener(objectPosition.valueProperty(), newValue -> {
-            objectList.getSelectionModel().getSelectedItem().setCenter(newValue);
-            update();
-        });
-        addListener(objectList.getSelectionModel().selectedItemProperty(), newItem -> {
-            if (newItem != null) {
-                objectPosition.setValue(newItem.getCenter());
-            }
-        });
+        selectionModel = objectList.getSelectionModel();
+        objectPosition.setDisable(false);
+        //todo bind objectPosition and selected item center
 
         aaCheckBox.selectedProperty().bindBidirectional(scene.aaEnabledProperty());
 
@@ -189,7 +184,7 @@ public class UIController {
     }
 
     public void resetFocus() {
-        objectList.getSelectionModel().clearSelection();
+        selectionModel.clearSelection();
         scene.getSelected().clear();
         root.requestFocus();
     }
@@ -224,15 +219,19 @@ public class UIController {
     }
 
     public void editObject() {
-        Object3D selectedItem = objectList.getSelectionModel().getSelectedItem();
-        Dialog<Object3D> editDialog = dialogFactory.createEditDialog(selectedItem);
-        Optional<Object3D> result = editDialog.showAndWait();
-        result.ifPresent(object3D -> scene.updateObject(selectedItem, object3D));
+        if (!sceneObjects.isEmpty()) {
+            Object3D selectedItem = selectionModel.getSelectedItem();
+            Dialog<Object3D> editDialog = dialogFactory.createEditDialog(selectedItem);
+            Optional<Object3D> result = editDialog.showAndWait();
+            result.ifPresent(object3D -> scene.updateObject(selectedItem, object3D));
+        }
     }
 
     public void deleteObject() {
-        Object3D selectedItem = objectList.getSelectionModel().getSelectedItem();
-        scene.deleteObject(selectedItem);
+        if (!sceneObjects.isEmpty()) {
+            Object3D selectedItem = selectionModel.getSelectedItem();
+            scene.deleteObject(selectedItem);
+        }
     }
 
     public void closeErrorBox() {
