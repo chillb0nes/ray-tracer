@@ -103,8 +103,18 @@ public class UIController {
     @FXML
     public void initialize() {
         scene = new Scene();
-        addSceneListeners();
+
+        cameraOriginSpinner.valueProperty().bindBidirectional(scene.cameraOriginProperty());
+        aaCheckBox.selectedProperty().bindBidirectional(scene.aaEnabledProperty());
+        selectionModel = objectList.getSelectionModel();
         sceneObjects = FXCollections.observableArrayList();
+        errorBoxAnimation = slideFromTopAnimation();
+
+        bindFovSlider();
+        bindMenuWidth();
+        bindSelectedItemCenter();
+        setMenuItemsUserData();
+        addSceneListeners();
 
         renderService = new RenderService();//todo DI
         renderService.setOnRunning(e -> {
@@ -120,40 +130,6 @@ public class UIController {
             });
             renderService.reset();
         });
-
-        fovSlider.valueProperty().bindBidirectional(scene.fovProperty());
-        fovSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            double increment = fovSlider.getBlockIncrement();
-            double value = Math.round(newValue.doubleValue() / increment) * increment;
-            fovSlider.setValue(value);
-        });
-        fovSlider.setValue(45);
-        fovLabel.textProperty().bind(fovSlider.valueProperty().asString(Locale.US, "%.1f"));
-
-        cameraOriginSpinner.valueProperty().bindBidirectional(scene.cameraOriginProperty());
-
-        fovSlider.setOnScroll(this::changeFovValue);
-
-        ReadOnlyDoubleProperty widthProperty = objectPosition.widthProperty();
-        objectList.prefWidthProperty().bind(widthProperty);
-        importBtn.prefWidthProperty().bind(widthProperty.divide(2));
-        exportBtn.prefWidthProperty().bind(widthProperty.divide(2));
-        newObjectBtn.prefWidthProperty().bind(widthProperty);
-        aaCheckBox.prefWidthProperty().bind(widthProperty);
-        saveBtn.prefWidthProperty().bind(sceneControls.widthProperty());
-
-        selectionModel = objectList.getSelectionModel();
-        objectPosition.setDisable(false);
-        //todo bind objectPosition and selected item center
-
-        aaCheckBox.selectedProperty().bindBidirectional(scene.aaEnabledProperty());
-
-        errorBoxAnimation = slideFromTopAnimation();
-
-        sphereItem.setUserData(Sphere.class);
-        triangleItem.setUserData(Triangle.class);
-        meshItem.setUserData(Mesh.class);
-        lightSourceItem.setUserData(LightSource.class);
     }
 
     private void addSceneListeners() {
@@ -163,6 +139,63 @@ public class UIController {
         addListener(scene.getObjects(), change -> update());
         addListener(scene.getLights(), change -> update());
         addListener(scene.getSelected(), change -> update());
+    }
+
+    private void bindFovSlider() {
+        fovSlider.valueProperty().bindBidirectional(scene.fovProperty());
+        fovSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            double increment = fovSlider.getBlockIncrement();
+            double value = Math.round(newValue.doubleValue() / increment) * increment;
+            fovSlider.setValue(value);
+        });
+        fovSlider.setOnScroll(this::changeFovValue);
+        fovSlider.setValue(45);
+        fovLabel.textProperty().bind(fovSlider.valueProperty().asString(Locale.US, "%.1f"));
+    }
+
+    private void bindMenuWidth() {
+        ReadOnlyDoubleProperty widthProperty = objectPosition.widthProperty();
+        objectList.prefWidthProperty().bind(widthProperty);
+        importBtn.prefWidthProperty().bind(widthProperty.divide(2));
+        exportBtn.prefWidthProperty().bind(widthProperty.divide(2));
+        newObjectBtn.prefWidthProperty().bind(widthProperty);
+        aaCheckBox.prefWidthProperty().bind(widthProperty);
+        saveBtn.prefWidthProperty().bind(sceneControls.widthProperty());
+    }
+
+    private void bindSelectedItemCenter() {
+        addListener(objectPosition.valueProperty(), newValue -> {
+            Object3D selected = selectionModel.getSelectedItem();
+            if (selected != null) {
+                if (!newValue.equals(selected.getCenter())) {
+                    selected.setCenter(newValue);
+                    update();
+                    selectionModel.select(selected);
+                }
+            }
+        });
+        addListener(selectionModel.selectedItemProperty(), selected -> {
+            Point3D center;
+            if (selected != null) {
+                center = selected.getCenter();
+                objectPosition.setDisable(false);
+            } else {
+                center = Point3D.ZERO;
+                objectPosition.setDisable(true);
+            }
+            if (!center.equals(objectPosition.getValue())) {
+                objectPosition.setValue(center);
+            }
+        });
+
+    }
+
+    private void setMenuItemsUserData() {
+        sphereItem.setUserData(Sphere.class);
+        triangleItem.setUserData(Triangle.class);
+        meshItem.setUserData(Mesh.class);
+        lightSourceItem.setUserData(LightSource.class);
+
     }
 
     public void setUp() {
@@ -184,7 +217,7 @@ public class UIController {
     }
 
     public void resetFocus() {
-        selectionModel.clearSelection();
+        objectList.getSelectionModel().clearSelection();
         scene.getSelected().clear();
         root.requestFocus();
     }
