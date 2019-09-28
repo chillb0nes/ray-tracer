@@ -4,11 +4,10 @@ import com.example.renderer.model.object.Mesh;
 import com.example.renderer.model.object.Renderable;
 import com.example.renderer.model.object.Sphere;
 import com.example.renderer.model.object.Triangle;
+import com.example.renderer.service.serialization.Point3DHelper;
+import com.example.renderer.service.serialization.RenderableHelper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.gson.Gson;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializer;
 import javafx.geometry.Point3D;
 import lombok.Getter;
 import org.hildan.fxgson.FxGson;
@@ -22,45 +21,18 @@ public class SerializationService {
 
     public SerializationService() {
         gson = FxGson.fullBuilder()
-                .registerTypeAdapter(Renderable.class, (JsonSerializer<Renderable>) (renderable, type, ctx) -> {
-                    JsonObject jsonObject = ctx.serialize(renderable).getAsJsonObject();
-                    jsonObject.addProperty("type", renderable.getClass().getSimpleName().toLowerCase());
-                    return jsonObject;
-                })
-                .registerTypeAdapter(Renderable.class, (JsonDeserializer<Renderable>) (jsonElement, type, ctx) -> {
-                    JsonObject jsonObject = jsonElement.getAsJsonObject();
-                    String typeName = jsonObject.getAsJsonPrimitive("type").getAsString();
-                    return ctx.deserialize(jsonElement, forName(typeName));
-                })
-                .registerTypeAdapter(Point3D.class, (JsonSerializer<Point3D>) (point3D, type, ctx) -> {
-                    JsonObject jsonObject = new JsonObject();
-                    jsonObject.addProperty("x", point3D.getX());
-                    jsonObject.addProperty("y", point3D.getY());
-                    jsonObject.addProperty("z", point3D.getZ());
-                    return jsonObject;
-                })
-                .registerTypeAdapter(Point3D.class, (JsonDeserializer<Point3D>) (jsonElement, type, ctx) -> {
-                    JsonObject jsonObject = jsonElement.getAsJsonObject();
-                    double x = jsonObject.getAsJsonPrimitive("x").getAsDouble();
-                    double y = jsonObject.getAsJsonPrimitive("y").getAsDouble();
-                    double z = jsonObject.getAsJsonPrimitive("z").getAsDouble();
-                    return new Point3D(x, y, z);
-                })
+                .registerTypeAdapter(Renderable.class, RenderableHelper.getSerializer())
+                .registerTypeAdapter(Renderable.class, RenderableHelper.getDeserializer())
+                .registerTypeAdapter(Sphere.class, RenderableHelper.getSerializer())
+                .registerTypeAdapter(Sphere.class, RenderableHelper.getDeserializer())
+                .registerTypeAdapter(Triangle.class, RenderableHelper.getSerializer())
+                .registerTypeAdapter(Triangle.class, RenderableHelper.getDeserializer())
+                .registerTypeAdapter(Mesh.class, RenderableHelper.getSerializer())
+                .registerTypeAdapter(Mesh.class, RenderableHelper.getDeserializer())
+                .registerTypeAdapter(Point3D.class, Point3DHelper.getSerializer())
+                .registerTypeAdapter(Point3D.class, Point3DHelper.getDeserializer())
                 .setPrettyPrinting()
                 .create();
-    }
-
-    private static Type forName(String name) {
-        switch (name.toLowerCase()) {
-            case "sphere":
-                return Sphere.class;
-            case "triangle":
-                return Triangle.class;
-            case "mesh":
-                return Mesh.class;
-            default:
-                throw new IllegalArgumentException();
-        }
     }
 
     public String toJson(Object value) {
@@ -79,5 +51,4 @@ public class SerializationService {
             }
         }.getType());
     }
-
 }
