@@ -14,9 +14,9 @@ import static com.example.renderer.view.util.ObservableUtils.addListener;
 
 @Getter
 public class Point3DSpinner extends HBox implements ValueNode<Point3D> {
-    private Spinner<Double> xSpinner;
-    private Spinner<Double> ySpinner;
-    private Spinner<Double> zSpinner;
+    private DoubleSpinner xSpinner;
+    private DoubleSpinner ySpinner;
+    private DoubleSpinner zSpinner;
     private ObjectProperty<Point3D> value;
 
     public Point3DSpinner() {
@@ -79,8 +79,7 @@ public class Point3DSpinner extends HBox implements ValueNode<Point3D> {
         this.value.set(value);
     }
 
-    private StackPane labeled(Spinner spinner, String text) {
-        spinner.setPrefWidth(60);
+    private static StackPane labeled(Spinner spinner, String text) {
         Label promptText = new Label(text);
         promptText.setDisable(true);
         promptText.prefWidthProperty().bind(spinner.widthProperty().subtract(10));

@@ -3,8 +3,10 @@ package com.example.renderer.model.object;
 import com.example.renderer.model.Material;
 import com.example.renderer.model.RayHit;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point3D;
@@ -17,65 +19,39 @@ import static java.util.Comparator.comparing;
 @Data
 public class Mesh extends Renderable {
 
-    private ObservableList<Triangle> triangles;
+    private ObjectProperty<ObservableList<Triangle>> triangles;
     private transient ReadOnlyObjectWrapper<Point3D> center;
 
     public Mesh() {
-        triangles = FXCollections.observableArrayList();
-        bindCenter();
+        setTriangles(FXCollections.observableArrayList());
     }
 
     public Mesh(List<Triangle> triangles) {
-        this.triangles = FXCollections.observableList(triangles);
-        bindCenter();
+        setTriangles(FXCollections.observableList(triangles));
     }
 
     public Mesh(Triangle... triangles) {
-        this.triangles = FXCollections.observableArrayList(triangles);
-        bindCenter();
+        setTriangles(FXCollections.observableArrayList(triangles));
     }
 
     public Mesh(Material material) {
         this();
-        this.material = material;
-        bindMaterial();
+        setMaterial(material);
     }
 
     public Mesh(Material material, List<Triangle> triangles) {
         this(triangles);
-        this.material = material;
-        bindMaterial();
+        setMaterial(material);
     }
 
     public Mesh(Material material, Triangle... triangles) {
         this(triangles);
-        this.material = material;
-        bindMaterial();
-    }
-
-    public void setTriangles(ObservableList<Triangle> triangles) {
-        this.triangles = triangles;
-        bindCenter();
-    }
-
-    private void bindCenter() {
-        center = new ReadOnlyObjectWrapper<>();
-        center.bind(Bindings.createObjectBinding(() -> {
-            Point3D sum = Point3D.ZERO;
-            for (Triangle triangle : triangles) {
-                sum = sum.add(triangle.getCenter());
-            }
-            return sum.multiply(1. / triangles.size());
-        }, triangles));
-    }
-
-    private void bindMaterial() {
-        triangles.forEach(triangle -> triangle.setMaterial(material));
+        setMaterial(material);
     }
 
     @Override
     public RayHit intersection(Point3D origin, Point3D direction) {
-        return triangles.stream()
+        return getTriangles().stream()
                 .map(triangle -> triangle.intersection(origin, direction))
                 .filter(RayHit::isHit)
                 .min(comparing(RayHit::getDistance))
@@ -86,10 +62,6 @@ public class Mesh extends Renderable {
         return center.get();
     }
 
-    public ReadOnlyProperty<Point3D> centerProperty() {
-        return center.getReadOnlyProperty();
-    }
-
     public void setCenter(Point3D newPoint) {
         Point3D oldPoint = this.center.get();
 
@@ -97,7 +69,7 @@ public class Mesh extends Renderable {
         double deltaY = newPoint.getY() - oldPoint.getY();
         double deltaZ = newPoint.getZ() - oldPoint.getZ();
 
-        triangles.forEach(triangle -> {
+        getTriangles().forEach(triangle -> {
             Point3D v0 = triangle.getV0();
             Point3D v1 = triangle.getV1();
             Point3D v2 = triangle.getV2();
@@ -117,5 +89,45 @@ public class Mesh extends Renderable {
                     v2.getY() + deltaY,
                     v2.getZ() + deltaZ));
         });
+    }
+
+    public ReadOnlyProperty<Point3D> centerProperty() {
+        return center.getReadOnlyProperty();
+    }
+
+    public void setMaterial(Material material) {
+        this.material = material;
+        bindMaterial();
+    }
+
+    private void bindMaterial() {
+        getTriangles().forEach(triangle -> triangle.setMaterial(material));
+    }
+
+    public ObservableList<Triangle> getTriangles() {
+        return triangles == null ? null : triangles.get();
+    }
+
+    public void setTriangles(ObservableList<Triangle> triangles) {
+        trianglesProperty().set(triangles);
+        bindCenter();
+    }
+
+    public ObjectProperty<ObservableList<Triangle>> trianglesProperty() {
+        if (triangles == null) {
+            triangles = new SimpleObjectProperty<>(this, "triangles");
+        }
+        return triangles;
+    }
+
+    private void bindCenter() {
+        center = new ReadOnlyObjectWrapper<>();
+        center.bind(Bindings.createObjectBinding(() -> {
+            Point3D sum = Point3D.ZERO;
+            for (Triangle triangle : getTriangles()) {
+                sum = sum.add(triangle.getCenter());
+            }
+            return sum.multiply(1. / getTriangles().size());
+        }, getTriangles()));
     }
 }

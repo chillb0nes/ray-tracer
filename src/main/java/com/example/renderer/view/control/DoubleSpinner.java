@@ -53,4 +53,9 @@ public class DoubleSpinner extends Spinner<Double> implements ValueNode<Double> 
     public void setValue(Double value) {
         getValueFactory().setValue(value);
     }
+
+    @Override
+    public Double getDefaultValue() {
+        return 0d;
+    }
 }

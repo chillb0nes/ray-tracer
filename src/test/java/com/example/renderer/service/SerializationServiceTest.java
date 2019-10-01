@@ -5,78 +5,85 @@ import com.example.renderer.model.Material;
 import com.example.renderer.model.Scene;
 import com.example.renderer.model.light.LightSource;
 import com.example.renderer.model.object.Mesh;
-import com.example.renderer.model.object.Renderable;
 import com.example.renderer.model.object.Sphere;
 import com.example.renderer.model.object.Triangle;
 import javafx.geometry.Point3D;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class SerializationServiceTest extends BaseTest {
 
-    private SerializationService serializationService = new SerializationService();
+    private static SerializationService serializationService = new SerializationService();
+
+    private static <T> void assertCopyEquals(T value) {
+        T copy = serializationService.copy(value);
+        assertEquals(value, copy);
+    }
 
     @Test
-    public void testSimplePoint3DSerialization() throws Exception {
+    public void testPoint3DSerialization() throws Exception {
         Point3D point3D = randomPoint3D();
-        assertPoint3DEquals(point3D, serializationService.copy(point3D));
+        assertCopyEquals(point3D);
     }
 
     @Test
-    public void testSimpleMaterialSerialization() throws Exception {
+    public void testMaterialSerialization() throws Exception {
         Material material = Material.random();
-        assertEquals(material, serializationService.copy(material));
+        assertCopyEquals(material);
     }
 
     @Test
-    public void testSimpleTriangleSerialization() throws Exception {
+    public void testTriangleSerialization() throws Exception {
         Triangle triangle = randomTriangle();
         triangle.setMaterial(Material.random());
-        assertEquals(triangle, serializationService.copy(triangle));
+        assertCopyEquals(triangle);
     }
 
     @Test
-    public void testSimpleMeshSerialization() throws Exception {
+    public void testMeshSerialization() throws Exception {
         Mesh mesh = randomMesh();
         mesh.setMaterial(Material.random());
-        assertEquals(mesh, serializationService.copy(mesh));
+        assertCopyEquals(mesh);
     }
 
     @Test
-    public void testSimpleSphereSerialization() throws Exception {
+    public void testSphereSerialization() throws Exception {
         Sphere sphere = new Sphere(randomPoint3D(), random.nextDouble());
         sphere.setMaterial(Material.random());
-        assertEquals(sphere, serializationService.copy(sphere));
+        assertCopyEquals(sphere);
     }
 
     @Test
-    public void testSimpleLightSourceSerialization() throws Exception {
+    public void testLightSourceSerialization() throws Exception {
         LightSource lightSource = new LightSource(randomPoint3D(), random.nextDouble());
-        assertEquals(lightSource, serializationService.copy(lightSource));
+        assertCopyEquals(lightSource);
     }
 
     @Test
     public void testSceneSerialization() throws Exception {
         Scene scene = new Scene();
-        randomLoop(0, () -> {
-            Renderable renderable;
-            switch (random.nextInt(2)) {
+        for (int i = 0; i < random.nextInt(100) + 10; i++) {
+            switch (random.nextInt(4)) {
                 case 0:
-                    renderable = new Sphere(randomPoint3D(), random.nextDouble());
+                    Sphere sphere = new Sphere(randomPoint3D(), random.nextDouble());
+                    sphere.setMaterial(Material.random());
+                    scene.addObject(sphere);
                     break;
                 case 1:
-                    renderable = randomTriangle();
+                    Triangle triangle = randomTriangle();
+                    triangle.setMaterial(Material.random());
+                    scene.addObject(triangle);
                     break;
-                default:
-                    renderable = randomMesh();
+                case 2:
+                    Mesh mesh = randomMesh();
+                    mesh.setMaterial(Material.random());
+                    scene.addObject(mesh);
+                    break;
+                case 3:
+                    LightSource lightSource = new LightSource(randomPoint3D(), random.nextDouble());
+                    scene.addObject(lightSource);
                     break;
             }
-            renderable.setMaterial(Material.random());
-            scene.addObject(renderable);
-        });
-        randomLoop(0, () -> scene.addObject(new LightSource(randomPoint3D(), random.nextDouble())));
-        assertEquals(scene, serializationService.copy(scene));
+        }
+        assertCopyEquals(scene);
     }
-
 }

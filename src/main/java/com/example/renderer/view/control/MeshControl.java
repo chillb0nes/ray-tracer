@@ -11,8 +11,6 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import lombok.Getter;
 
-import java.util.function.Supplier;
-
 @Getter
 public class MeshControl extends VBox implements ValueNode<Mesh> {
     private ExpandableListView<Triangle> listView;
@@ -20,19 +18,10 @@ public class MeshControl extends VBox implements ValueNode<Mesh> {
     private ObjectProperty<Mesh> value;
 
     public MeshControl() {
-        this(new ExpandableListView<>());
-    }
+        listView = new ExpandableListView<>(TriangleControl::new);
 
-    public MeshControl(Supplier<ValueNode<Triangle>> nodeFactory) {
-        this(new ExpandableListView<>(nodeFactory));
-    }
-
-    private MeshControl(ExpandableListView<Triangle> listView) {
-        this.listView = listView;
-
-        Mesh mesh = new Mesh();
-        value = new SimpleObjectProperty<>(mesh);
-        mesh.setTriangles(listView.getItems());
+        value = new SimpleObjectProperty<>(new Mesh());
+        value.get().trianglesProperty().bindBidirectional(listView.itemsProperty());
 
         addButton = new Button("Add");
         addButton.setOnAction(event -> listView.getItems().add(new Triangle()));
@@ -63,7 +52,7 @@ public class MeshControl extends VBox implements ValueNode<Mesh> {
 
     @Override
     public void setValue(Mesh value) {
-        valueProperty().set(value);
-        listView.getItems().setAll(value.getTriangles());
+        this.value.set(value);
+        this.value.get().trianglesProperty().bindBidirectional(listView.itemsProperty());
     }
 }

@@ -28,7 +28,7 @@ public abstract class CustomDialog<T extends Object3D> extends Dialog<T> {
     private static final Map<Class, Supplier<ValueNode>> CONTROLS = ImmutableMap.of(
             Sphere.class, SphereControl::new,
             Triangle.class, TriangleControl::new,
-            Mesh.class, () -> new MeshControl(TriangleControl::new),
+            Mesh.class, MeshControl::new,
             LightSource.class, LightSourceControl::new,
             Material.class, MaterialControl::new);
 
