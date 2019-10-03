@@ -29,7 +29,7 @@ public class DefaultRayTracer implements TaskAwareRenderer {
         for (int j = 0; j < scene.getHeight(); j++) {
             for (int i = 0; i < scene.getWidth(); i++) {
                 if (task.isCancelled()) {
-                    throw new InterruptedException();
+                    throw new InterruptedException("Task was cancelled");
                 }
                 Color result = castRay(scene, i, j);
                 image.getPixelWriter().setColor(i, j, result);
