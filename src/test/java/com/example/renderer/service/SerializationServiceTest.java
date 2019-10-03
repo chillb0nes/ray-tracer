@@ -7,6 +7,7 @@ import com.example.renderer.model.light.LightSource;
 import com.example.renderer.model.object.Mesh;
 import com.example.renderer.model.object.Sphere;
 import com.example.renderer.model.object.Triangle;
+import com.example.renderer.service.serialization.SerializationService;
 import javafx.geometry.Point3D;
 import org.junit.Test;
 

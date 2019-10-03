@@ -1,5 +1,6 @@
-package com.example.renderer.service;
+package com.example.renderer.service.dialog;
 
+import com.example.renderer.service.serialization.SerializationService;
 import com.example.renderer.view.component.dialog.EditDialog;
 import com.example.renderer.view.component.dialog.NewDialog;
 import com.example.renderer.model.object.*;

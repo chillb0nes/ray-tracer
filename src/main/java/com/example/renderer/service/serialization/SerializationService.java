@@ -1,11 +1,9 @@
-package com.example.renderer.service;
+package com.example.renderer.service.serialization;
 
 import com.example.renderer.model.object.Mesh;
 import com.example.renderer.model.object.Renderable;
 import com.example.renderer.model.object.Sphere;
 import com.example.renderer.model.object.Triangle;
-import com.example.renderer.service.serialization.Point3DHelper;
-import com.example.renderer.service.serialization.RenderableHelper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.gson.Gson;
 import javafx.geometry.Point3D;

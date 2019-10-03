@@ -1,11 +1,9 @@
 package com.example.renderer.model.object;
 
 import com.example.renderer.BaseTest;
-import com.example.renderer.service.SerializationService;
+import com.example.renderer.service.serialization.SerializationService;
 import javafx.geometry.Point3D;
 import org.junit.Test;
-
-import java.io.IOException;
 
 public class CenterBindingTest extends BaseTest {
 

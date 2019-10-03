@@ -7,9 +7,11 @@ import com.example.renderer.model.object.Mesh;
 import com.example.renderer.model.object.Object3D;
 import com.example.renderer.model.object.Sphere;
 import com.example.renderer.model.object.Triangle;
-import com.example.renderer.service.DialogFactory;
-import com.example.renderer.service.RenderService;
-import com.example.renderer.service.SerializationService;
+import com.example.renderer.service.dialog.DialogFactory;
+import com.example.renderer.service.render.DefaultRayTracer;
+import com.example.renderer.service.render.RenderService;
+import com.example.renderer.service.render.TaskAwareRenderer;
+import com.example.renderer.service.serialization.SerializationService;
 import com.example.renderer.view.component.InputGroup;
 import com.example.renderer.view.component.ScrollablePane;
 import com.example.renderer.view.control.Point3DSpinner;
@@ -29,6 +31,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import lombok.Setter;
@@ -116,7 +119,8 @@ public class UIController {
         setMenuItemsUserData();
         addSceneListeners();
 
-        renderService = new RenderService();//todo DI
+        TaskAwareRenderer rayTracer = new DefaultRayTracer(4, Color.LIGHTBLUE);
+        renderService = new RenderService(rayTracer);//todo DI
         renderService.setOnRunning(e -> {
             loader.setVisible(true);
             ThreadContext.push(String.valueOf(System.currentTimeMillis()));
@@ -128,7 +132,6 @@ public class UIController {
                 String start = ThreadContext.pop();
                 return System.currentTimeMillis() - Long.parseLong(start);
             });
-            renderService.reset();
         });
     }
 

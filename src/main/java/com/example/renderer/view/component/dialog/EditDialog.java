@@ -17,7 +17,7 @@ public class EditDialog<T extends Object3D> extends CustomDialog<T> {
 
         copy = copier.apply(item);
         objectControl.setValue(copy);
-        if (isRenderable()) {
+        if (isRenderable() && ((Renderable) copy).getMaterial() != null) {
             materialControl.setValue(((Renderable) copy).getMaterial());
         }
     }
