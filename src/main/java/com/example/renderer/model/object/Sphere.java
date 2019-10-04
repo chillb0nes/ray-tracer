@@ -5,11 +5,13 @@ import com.example.renderer.model.RayHit;
 import javafx.geometry.Point3D;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import static java.lang.Math.sqrt;
 
 @Data
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class Sphere extends Renderable {
 
     private Point3D center;

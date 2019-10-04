@@ -140,7 +140,7 @@ public class UIController {
         addListener(scene.aaEnabledProperty(), newValue -> update());
         addListener(scene.cameraOriginProperty(), newValue -> update());
         addListener(scene.getObjects(), change -> update());
-        addListener(scene.getLights(), change -> update());
+        //addListener(scene.getLights(), change -> update());
         addListener(scene.getSelected(), change -> update());
     }
 

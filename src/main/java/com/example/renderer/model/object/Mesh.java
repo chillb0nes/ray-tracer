@@ -11,12 +11,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point3D;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
 import static java.util.Comparator.comparing;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class Mesh extends Renderable {
 
     private ObjectProperty<ObservableList<Triangle>> triangles;

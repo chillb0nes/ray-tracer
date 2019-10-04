@@ -11,12 +11,17 @@ import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ForkJoinPool;
 
 import static com.example.renderer.service.render.RayTraceUtils.*;
 
+@Log4j2
 @AllArgsConstructor
 public class DefaultRayTracer implements TaskAwareRenderer {
 
@@ -25,17 +30,37 @@ public class DefaultRayTracer implements TaskAwareRenderer {
 
     @Override
     public Image getImage(final Scene scene, Task task) throws InterruptedException {
+        ExecutorService executor = getExecutor();
         WritableImage image = new WritableImage(scene.getWidth(), scene.getHeight());
+        int pixelCount = scene.getWidth() * scene.getHeight();
+        CountDownLatch latch = new CountDownLatch(pixelCount);
         for (int j = 0; j < scene.getHeight(); j++) {
             for (int i = 0; i < scene.getWidth(); i++) {
-                if (task.isCancelled()) {
-                    throw new InterruptedException("Task was cancelled");
-                }
-                Color result = castRay(scene, i, j);
-                image.getPixelWriter().setColor(i, j, result);
+                final int x = i;
+                final int y = j;
+                executor.execute(() -> {
+                    if (task.isCancelled()) {
+                        Thread.currentThread().interrupt();
+                        executor.shutdownNow();
+                        throw new RuntimeException("Task was cancelled");
+                    }
+                    Color result = castRay(scene, x, y);
+                    image.getPixelWriter().setColor(x, y, result);
+                    latch.countDown();
+                });
             }
         }
+        latch.await();
+        executor.shutdownNow();
         return image;
+    }
+
+    private static ExecutorService getExecutor() {
+        return new ForkJoinPool(
+                Runtime.getRuntime().availableProcessors(),
+                ForkJoinPool.defaultForkJoinWorkerThreadFactory,
+                (t, e) -> log.error(e),
+                true);
     }
 
     private Color castRay(Scene scene, int pixelX, int pixelY) {

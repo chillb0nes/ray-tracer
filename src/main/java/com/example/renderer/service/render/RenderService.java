@@ -3,11 +3,9 @@ package com.example.renderer.service.render;
 import com.example.renderer.model.Scene;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.image.Image;
-import lombok.extern.log4j.Log4j2;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
