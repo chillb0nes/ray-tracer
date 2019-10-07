@@ -59,10 +59,14 @@
                 </InputGroup>
                 <InputGroup fx:id="sceneControls" title="Scene controls">
                     <children>
-                        <FlowPane>
+                    <VBox>
+                    <children>
+                        <HBox>
                             <children>
                                 <Button fx:id="importBtn" mnemonicParsing="false" onAction="#importScene" text="Import" />
                                 <Button fx:id="exportBtn" mnemonicParsing="false" onAction="#exportScene" text="Export " />
+                            </children>
+                        </HBox>
                                 <ListView fx:id="objectList" prefHeight="100">
                                     <cellFactory>
                                         <Object3DCellFactory />
@@ -77,8 +81,8 @@
                                         </ContextMenu>
                                     </contextMenu>
                                 </ListView>
-                            </children>
-                        </FlowPane>
+                    </children>
+                    </VBox>
                         <Point3DSpinner fx:id="objectPosition" disable="true"/>
                         <MenuButton fx:id="newObjectBtn" mnemonicParsing="false" popupSide="LEFT" text="New object">
                             <items>
