@@ -3,14 +3,9 @@ package com.example.renderer.controller;
 import com.example.renderer.model.Material;
 import com.example.renderer.model.Scene;
 import com.example.renderer.model.light.LightSource;
-import com.example.renderer.model.object.Mesh;
-import com.example.renderer.model.object.Object3D;
-import com.example.renderer.model.object.Sphere;
-import com.example.renderer.model.object.Triangle;
+import com.example.renderer.model.object.*;
 import com.example.renderer.service.dialog.DialogFactory;
-import com.example.renderer.service.render.DefaultRayTracer;
-import com.example.renderer.service.render.RenderService;
-import com.example.renderer.service.render.TaskAwareRenderer;
+import com.example.renderer.service.render.*;
 import com.example.renderer.service.serialization.SerializationService;
 import com.example.renderer.view.component.InputGroup;
 import com.example.renderer.view.component.ScrollablePane;
@@ -110,7 +105,6 @@ public class UIController {
         cameraOriginSpinner.valueProperty().bindBidirectional(scene.cameraOriginProperty());
         aaCheckBox.selectedProperty().bindBidirectional(scene.aaEnabledProperty());
         selectionModel = objectList.getSelectionModel();
-        sceneObjects = FXCollections.observableArrayList();
         errorBoxAnimation = slideFromTopAnimation();
 
         bindFovSlider();
@@ -119,8 +113,9 @@ public class UIController {
         setMenuItemsUserData();
         addSceneListeners();
 
-        TaskAwareRenderer rayTracer = new DefaultRayTracer(4, Color.LIGHTBLUE);
-        renderService = new RenderService(rayTracer);//todo DI
+        TaskAwareExecutorRenderer rayTracer = new DefaultRayTracer(4, Color.LIGHTBLUE);
+        TaskAwareExecutorRenderer outlineRayTracer = new OutlineRayTracer(Color.MAGENTA);
+        renderService = new RenderService(rayTracer, outlineRayTracer);//todo DI
         renderService.setOnRunning(e -> {
             loader.setVisible(true);
             ThreadContext.push(String.valueOf(System.currentTimeMillis()));
@@ -139,9 +134,9 @@ public class UIController {
         addListener(scene.fovProperty(), newValue -> update());
         addListener(scene.aaEnabledProperty(), newValue -> update());
         addListener(scene.cameraOriginProperty(), newValue -> update());
+        addListener(scene.selectedProperty(), newValue -> update());
         addListener(scene.getObjects(), change -> update());
         //addListener(scene.getLights(), change -> update());
-        addListener(scene.getSelected(), change -> update());
     }
 
     private void bindFovSlider() {
@@ -167,8 +162,10 @@ public class UIController {
     }
 
     private void bindSelectedItemCenter() {
+        scene.selectedProperty().bind(objectList.getSelectionModel().selectedItemProperty());
+
         addListener(objectPosition.valueProperty(), newValue -> {
-            Object3D selected = selectionModel.getSelectedItem();
+            Object3D selected = scene.getSelected();
             if (selected != null) {
                 if (!newValue.equals(selected.getCenter())) {
                     selected.setCenter(newValue);
@@ -177,7 +174,8 @@ public class UIController {
                 }
             }
         });
-        addListener(selectionModel.selectedItemProperty(), selected -> {
+
+        addListener(scene.selectedProperty(), selected -> {
             Point3D center;
             if (selected != null) {
                 center = selected.getCenter();
@@ -190,7 +188,6 @@ public class UIController {
                 objectPosition.setValue(center);
             }
         });
-
     }
 
     private void setMenuItemsUserData() {
@@ -212,7 +209,7 @@ public class UIController {
     }
 
     private void update() {
-        sceneObjects.clear();
+        sceneObjects = FXCollections.observableArrayList();
         sceneObjects.addAll(scene.getObjects());
         sceneObjects.addAll(scene.getLights());
         objectList.setItems(sceneObjects);
@@ -221,7 +218,6 @@ public class UIController {
 
     public void resetFocus() {
         objectList.getSelectionModel().clearSelection();
-        scene.getSelected().clear();
         root.requestFocus();
     }
 
@@ -255,7 +251,7 @@ public class UIController {
     }
 
     public void editObject() {
-        if (!sceneObjects.isEmpty()) {
+        if (!objectList.getItems().isEmpty()) {
             Object3D selectedItem = selectionModel.getSelectedItem();
             Dialog<Object3D> editDialog = dialogFactory.createEditDialog(selectedItem);
             Optional<Object3D> result = editDialog.showAndWait();
@@ -264,7 +260,7 @@ public class UIController {
     }
 
     public void deleteObject() {
-        if (!sceneObjects.isEmpty()) {
+        if (!objectList.getItems().isEmpty()) {
             Object3D selectedItem = selectionModel.getSelectedItem();
             scene.deleteObject(selectedItem);
         }

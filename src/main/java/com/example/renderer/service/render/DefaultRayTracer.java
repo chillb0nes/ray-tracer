@@ -8,6 +8,7 @@ import com.example.renderer.model.object.Renderable;
 import javafx.concurrent.Task;
 import javafx.geometry.Point3D;
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import lombok.AllArgsConstructor;
@@ -17,13 +18,12 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
 
 import static com.example.renderer.service.render.RayTraceUtils.*;
 
 @Log4j2
 @AllArgsConstructor
-public class DefaultRayTracer implements TaskAwareRenderer {
+public class DefaultRayTracer implements TaskAwareExecutorRenderer {
 
     private int maxBounceCount;
     private Color background;
@@ -32,6 +32,7 @@ public class DefaultRayTracer implements TaskAwareRenderer {
     public Image getImage(final Scene scene, Task task) throws InterruptedException {
         ExecutorService executor = getExecutor();
         WritableImage image = new WritableImage(scene.getWidth(), scene.getHeight());
+        PixelWriter writer = image.getPixelWriter();
         int pixelCount = scene.getWidth() * scene.getHeight();
         CountDownLatch latch = new CountDownLatch(pixelCount);
         for (int j = 0; j < scene.getHeight(); j++) {
@@ -40,12 +41,11 @@ public class DefaultRayTracer implements TaskAwareRenderer {
                 final int y = j;
                 executor.execute(() -> {
                     if (task.isCancelled()) {
-                        Thread.currentThread().interrupt();
                         executor.shutdownNow();
                         throw new RuntimeException("Task was cancelled");
                     }
                     Color result = castRay(scene, x, y);
-                    image.getPixelWriter().setColor(x, y, result);
+                    writer.setColor(x, y, result);
                     latch.countDown();
                 });
             }
@@ -55,18 +55,8 @@ public class DefaultRayTracer implements TaskAwareRenderer {
         return image;
     }
 
-    private static ExecutorService getExecutor() {
-        return new ForkJoinPool(
-                Runtime.getRuntime().availableProcessors(),
-                ForkJoinPool.defaultForkJoinWorkerThreadFactory,
-                (t, e) -> log.error(e),
-                true);
-    }
-
-    private Color castRay(Scene scene, int pixelX, int pixelY) {
-        double x = getXForPixel(pixelX, scene.getWidth(), scene.getHeight(), scene.getFov());
-        double y = getYForPixel(pixelY, scene.getHeight(), scene.getFov());
-        Point3D direction = new Point3D(x, y, -1).normalize();
+    private Color castRay(Scene scene, int x, int y) {
+        Point3D direction = getDirectionForPixel(x, y, scene.getWidth(), scene.getHeight(), scene.getFov());
         return castRay(scene, scene.getCameraOrigin(), direction, 0);
     }
 

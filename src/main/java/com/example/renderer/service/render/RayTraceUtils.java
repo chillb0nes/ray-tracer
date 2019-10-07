@@ -1,8 +1,12 @@
 package com.example.renderer.service.render;
 
+import com.example.renderer.model.RayHit;
+import com.example.renderer.model.object.Renderable;
 import javafx.geometry.Point3D;
 import javafx.scene.paint.Color;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.function.UnaryOperator;
 
 import static java.lang.Math.abs;
@@ -19,6 +23,20 @@ public class RayTraceUtils {
 
     public static double getYForPixel(int y, double height, double fov) {
         return (1 - 2 * (y + 0.5) / height) * tan(fov / 2);
+    }
+
+    public static Point3D getDirectionForPixel(int pixelX, int pixelY, double width, double height, double fov) {
+        double x = getXForPixel(pixelX, width, height, fov);
+        double y = getYForPixel(pixelY, height, fov);
+        return new Point3D(x, y, -1).normalize();
+    }
+
+    public static RayHit getRayHit(Collection<Renderable> objects, Point3D origin, Point3D direction) {
+        return objects.stream()
+                .map(object3D -> object3D.intersection(origin, direction))
+                .filter(RayHit::isHit)
+                .min(Comparator.comparing(RayHit::getDistance))
+                .orElse(RayHit.MISS);
     }
 
     public static Point3D reflect(Point3D I, Point3D N) {

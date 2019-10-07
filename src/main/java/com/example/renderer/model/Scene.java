@@ -19,11 +19,10 @@ public class Scene {
     private DoubleProperty fov;
     private BooleanProperty aaEnabled;
     private ObjectProperty<Point3D> cameraOrigin;
+    private transient ObjectProperty<Object3D> selected;
 
     private ObservableList<Renderable> objects;
     private ObservableList<LightSource> lights;
-
-    private transient ObservableList<Renderable> selected;
 
     public Scene() {
         this(640, 480);
@@ -36,10 +35,10 @@ public class Scene {
         fov = new SimpleDoubleProperty();
         aaEnabled = new SimpleBooleanProperty();
         cameraOrigin = new SimpleObjectProperty<>(Point3D.ZERO);
+        selected = new SimpleObjectProperty<>();
 
         objects = FXCollections.observableArrayList();
         lights = FXCollections.observableArrayList();
-        selected = FXCollections.observableArrayList();
     }
 
     public int getWidth() {
@@ -120,5 +119,17 @@ public class Scene {
 
     public ObjectProperty<Point3D> cameraOriginProperty() {
         return cameraOrigin;
+    }
+
+    public Object3D getSelected() {
+        return selected.get();
+    }
+
+    public ObjectProperty<Object3D> selectedProperty() {
+        return selected;
+    }
+
+    public void setSelected(Object3D selected) {
+        this.selected.set(selected);
     }
 }

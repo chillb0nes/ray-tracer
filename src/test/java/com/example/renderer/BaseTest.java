@@ -106,6 +106,7 @@ public class BaseTest {
         assertEquals(join(message, "height"), expected.getHeight(), actual.getHeight());
         assertEquals(join(message, "fov"), expected.getFov(), actual.getFov());
         assertEquals(join(message, "aa"), expected.isAaEnabled(), actual.isAaEnabled());
+        assertEquals(join(message, "selected"), expected.getSelected(), actual.getSelected());
         assertEquals(join(message, "cameraOrigin"), expected.getCameraOrigin(), actual.getCameraOrigin());
 
         expected.getObjects().forEach(object3d -> {
@@ -117,11 +118,6 @@ public class BaseTest {
             int i = expected.getLights().indexOf(lightSource);
             String join = join(message, String.format("light[%d]", i));
             assertEquals(join, lightSource, actual.getLights().get(i));
-        });
-        expected.getSelected().forEach(object3d -> {
-            int i = expected.getSelected().indexOf(object3d);
-            String join = join(message, String.format("selected[%d %s]", i, object3d.getClass()));
-            assertEquals(join, object3d, actual.getSelected().get(i));
         });
     }
 
