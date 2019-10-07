@@ -23,16 +23,20 @@ import javafx.animation.Timeline;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.geometry.Point3D;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import lombok.Setter;
@@ -40,6 +44,11 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.ThreadContext;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Random;
@@ -106,6 +115,8 @@ public class UIController {
     private DialogFactory dialogFactory;
     private Stage stage;
     private Timeline errorBoxAnimation;
+    private SerializationService serializationService;
+    private File lastSelectedFile;
 
     @FXML
     public void initialize() {
@@ -138,6 +149,9 @@ public class UIController {
                 return System.currentTimeMillis() - Long.parseLong(start);
             });
         });
+        serializationService = new SerializationService();
+        lastSelectedFile = new File(System.getProperty("user.home"));
+        saveBtn.disableProperty().bind(image.imageProperty().isNull());
     }
 
     private void addSceneListeners() {
@@ -209,7 +223,7 @@ public class UIController {
     }
 
     public void setUp() {
-        dialogFactory = new DialogFactory(stage, new SerializationService());//todo DI
+        dialogFactory = new DialogFactory(stage, serializationService);//todo DI
         hideErrorBox();
         resetFocus();
     }
@@ -239,16 +253,61 @@ public class UIController {
         }
     }
 
-    public void importScene() {
-        throw new UnsupportedOperationException("importScene not implemented");
+    public void importScene() throws IOException {
+        FileChooser fc = new FileChooser();
+        fc.setInitialDirectory(lastSelectedFile);
+        fc.getExtensionFilters().add(new ExtensionFilter("JSON", "*.json"));
+        fc.setTitle("Import Scene");
+        File file = fc.showOpenDialog(stage);
+        if (file != null) {
+            lastSelectedFile = file.getParentFile();
+            String json = new String(Files.readAllBytes(file.toPath()));
+            scene = serializationService.fromJson(json, Scene.class);
+            update();
+        }
     }
 
-    public void exportScene() {
-        throw new UnsupportedOperationException("exportScene not implemented");
+    public void exportScene() throws IOException {
+        FileChooser fc = new FileChooser();
+        fc.setInitialDirectory(lastSelectedFile);
+        fc.getExtensionFilters().add(new ExtensionFilter("JSON", "*.json"));
+        fc.setTitle("Export Scene");
+        File file = fc.showSaveDialog(stage);
+        if (file != null) {
+            lastSelectedFile = file.getParentFile();
+            String json = serializationService.toJson(scene);
+            Files.write(file.toPath(), json.getBytes());
+            log.debug("Saved current scene to {}", file);
+        }
     }
 
-    public void saveImage() {
-        throw new UnsupportedOperationException("saveImage not implemented");
+    public void saveImage() throws IOException {
+        FileChooser fc = new FileChooser();
+        fc.setInitialDirectory(lastSelectedFile);
+        fc.getExtensionFilters().addAll(
+                new ExtensionFilter("JPG", "*.jpg", "*.jpeg"),
+                new ExtensionFilter("GIF", "*.gif"),
+                new ExtensionFilter("PNG", "*.png")
+        );
+        fc.setTitle("Save Image");
+        File file = fc.showSaveDialog(stage);
+        if (file != null) {
+            lastSelectedFile = file.getParentFile();
+            String extension = fc.getSelectedExtensionFilter().getDescription();
+            ImageIO.write(toBufferedImage(image.getImage(), extension), extension, file);
+            log.debug("Saved current image to {}", file);
+        }
+    }
+
+    private BufferedImage toBufferedImage(Image image, String extension) {
+        BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);
+        if (!"jpg".equalsIgnoreCase(extension)) {
+            return bImage;
+        }
+        // fix for wrong colors in jpg files
+        BufferedImage bImage1 = new BufferedImage(bImage.getWidth(), bImage.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+        bImage1.getGraphics().drawImage(bImage, 0, 0, null);
+        return bImage1;
     }
 
     @SuppressWarnings("unchecked")
