@@ -3,9 +3,15 @@ package com.example.renderer.controller;
 import com.example.renderer.model.Material;
 import com.example.renderer.model.Scene;
 import com.example.renderer.model.light.LightSource;
-import com.example.renderer.model.object.*;
+import com.example.renderer.model.object.Mesh;
+import com.example.renderer.model.object.Object3D;
+import com.example.renderer.model.object.Sphere;
+import com.example.renderer.model.object.Triangle;
 import com.example.renderer.service.dialog.DialogFactory;
-import com.example.renderer.service.render.*;
+import com.example.renderer.service.render.DefaultRayTracer;
+import com.example.renderer.service.render.OutlineRayTracer;
+import com.example.renderer.service.render.RenderService;
+import com.example.renderer.service.render.TaskAwareExecutorRenderer;
 import com.example.renderer.service.serialization.SerializationService;
 import com.example.renderer.view.component.InputGroup;
 import com.example.renderer.view.component.ScrollablePane;
@@ -37,6 +43,8 @@ import org.apache.logging.log4j.ThreadContext;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.example.renderer.view.util.ObservableUtils.addListener;
 
@@ -94,6 +102,7 @@ public class UIController {
     private MultipleSelectionModel<Object3D> selectionModel;
     private ObservableList<Object3D> sceneObjects;
     private RenderService renderService;
+    private ExecutorService loaderPresenter;
     private DialogFactory dialogFactory;
     private Stage stage;
     private Timeline errorBoxAnimation;
@@ -117,12 +126,13 @@ public class UIController {
         TaskAwareExecutorRenderer outlineRayTracer = new OutlineRayTracer(Color.MAGENTA);
         renderService = new RenderService(rayTracer, outlineRayTracer);//todo DI
         renderService.setOnRunning(e -> {
-            loader.setVisible(true);
-            ThreadContext.push(String.valueOf(System.currentTimeMillis()));
+            long startTime = System.currentTimeMillis();
+            showLoader();
+            ThreadContext.push(String.valueOf(startTime));
         });
         renderService.setOnSucceeded(e -> {
             image.setImage(renderService.getValue());
-            loader.setVisible(false);
+            hideLoader();
             log.trace("Image is rendered in {}ms", () -> {
                 String start = ThreadContext.pop();
                 return System.currentTimeMillis() - Long.parseLong(start);
@@ -264,6 +274,23 @@ public class UIController {
             Object3D selectedItem = selectionModel.getSelectedItem();
             scene.deleteObject(selectedItem);
         }
+    }
+
+    private void showLoader() {
+        loaderPresenter = Executors.newSingleThreadExecutor();
+        loaderPresenter.execute(() -> {
+            try {
+                Thread.sleep(200);
+                loader.setVisible(true);
+            } catch (InterruptedException ignored) {
+                loader.setVisible(false);
+            }
+        });
+    }
+
+    private void hideLoader() {
+        loader.setVisible(false);
+        loaderPresenter.shutdownNow();
     }
 
     public void closeErrorBox() {
