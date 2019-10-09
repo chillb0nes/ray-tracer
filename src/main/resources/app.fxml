@@ -70,9 +70,10 @@
                                     <contextMenu>
                                         <ContextMenu>
                                             <items>
-                                                <SeparatorMenuItem mnemonicParsing="false" />
                                                 <MenuItem onAction="#editObject" text="Edit" />
                                                 <MenuItem onAction="#deleteObject" text="Delete" />
+                                                <SeparatorMenuItem mnemonicParsing="false" />
+                                                <MenuItem onAction="#clearScene" text="Clear"/>
                                             </items>
                                         </ContextMenu>
                                     </contextMenu>

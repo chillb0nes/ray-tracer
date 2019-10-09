@@ -14,7 +14,6 @@ import com.example.renderer.service.render.RenderService;
 import com.example.renderer.service.render.TaskAwareExecutorRenderer;
 import com.example.renderer.service.serialization.SerializationService;
 import com.example.renderer.view.component.InputGroup;
-import com.example.renderer.view.component.ScrollablePane;
 import com.example.renderer.view.control.Point3DSpinner;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -336,6 +335,13 @@ public class UIController {
             Object3D selectedItem = selectionModel.getSelectedItem();
             scene.deleteObject(selectedItem);
         }
+    }
+
+    public void clearScene() {
+        scene.setFov(45);
+        scene.getObjects().clear();
+        scene.getLights().clear();
+        update();
     }
 
     private void showLoader() {
