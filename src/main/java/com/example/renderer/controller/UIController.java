@@ -99,10 +99,6 @@ public class UIController {
     @FXML
     private Button saveBtn;
     @FXML
-    private ScrollablePane imageArea;
-    @FXML
-    private ScrollablePane sliderArea;
-    @FXML
     private HBox errorBox;
     @FXML
     private Label errorBoxText;
@@ -224,8 +220,9 @@ public class UIController {
 
     public void setUp() {
         dialogFactory = new DialogFactory(stage, serializationService);//todo DI
-        hideErrorBox();
+        closeErrorBox();
         resetFocus();
+        update();
     }
 
     public void updateModel() {
@@ -316,7 +313,10 @@ public class UIController {
         Class<Object3D> userData = (Class<Object3D>) menuItem.getUserData();
         Dialog<Object3D> newDialog = dialogFactory.createNewDialog(userData);
         Optional<Object3D> result = newDialog.showAndWait();
-        result.ifPresent(object3D -> scene.addObject(object3D));
+        result.ifPresent(object3D -> {
+            scene.addObject(object3D);
+            objectList.getSelectionModel().select(object3D);
+        });
     }
 
     public void editObject() {
@@ -324,7 +324,10 @@ public class UIController {
             Object3D selectedItem = selectionModel.getSelectedItem();
             Dialog<Object3D> editDialog = dialogFactory.createEditDialog(selectedItem);
             Optional<Object3D> result = editDialog.showAndWait();
-            result.ifPresent(object3D -> scene.updateObject(selectedItem, object3D));
+            result.ifPresent(object3D -> {
+                scene.updateObject(selectedItem, object3D);
+                objectList.getSelectionModel().select(object3D);
+            });
         }
     }
 
@@ -341,7 +344,7 @@ public class UIController {
             try {
                 Thread.sleep(200);
                 loader.setVisible(true);
-            } catch (InterruptedException ignored) {
+            } catch (InterruptedException e) {
                 loader.setVisible(false);
             }
         });
@@ -353,13 +356,9 @@ public class UIController {
     }
 
     public void closeErrorBox() {
-        hideErrorBox();
-        errorBoxText.setText("");
-    }
-
-    private void hideErrorBox() {
         double totalHeight = errorBox.getHeight() + errorBox.getInsets().getTop() + errorBox.getLayoutY();
         errorBox.translateYProperty().setValue(-totalHeight);
+        errorBox.setVisible(false);
     }
 
     private Timeline slideFromTopAnimation() {
@@ -373,13 +372,14 @@ public class UIController {
     public Thread.UncaughtExceptionHandler getExceptionHandler() {
         return (t, e) -> {
             log.error("Uncaught exception:", e);
-            hideErrorBox();
+            closeErrorBox();
 
             String message = ExceptionUtils.getMessage(e);
             String cause = ExceptionUtils.getRootCauseMessage(e);
             String errorMessage = String.format("[ERROR] %s \nCaused by %s", message, cause);
 
             errorBoxText.setText(errorMessage);
+            errorBox.setVisible(true);
             errorBoxAnimation.play();
         };
     }
