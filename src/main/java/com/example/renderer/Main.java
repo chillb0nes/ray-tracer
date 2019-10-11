@@ -41,7 +41,8 @@ public class Main extends Application {
         });*/
 
         primaryStage.show();
-        controller.setUp();
+        controller.setStage(primaryStage);
+        root.requestFocus();
     }
 
     public static void main(String... args) {

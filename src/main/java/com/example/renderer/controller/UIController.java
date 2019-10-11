@@ -128,6 +128,7 @@ public class UIController {
         setMenuItemsUserData();
         addSceneListeners();
 
+        serializationService = new SerializationService();//todo DI
         TaskAwareExecutorRenderer rayTracer = new DefaultRayTracer(4, Color.LIGHTBLUE);
         TaskAwareExecutorRenderer outlineRayTracer = new OutlineRayTracer(Color.MAGENTA);
         renderService = new RenderService(rayTracer, outlineRayTracer);//todo DI
@@ -147,6 +148,11 @@ public class UIController {
         serializationService = new SerializationService();
         lastSelectedFile = new File(System.getProperty("user.home"));
         saveBtn.disableProperty().bind(image.imageProperty().isNull());
+    }
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+        dialogFactory = new DialogFactory(stage, serializationService);//todo DI
     }
 
     private void addSceneListeners() {
@@ -215,13 +221,6 @@ public class UIController {
         meshItem.setUserData(Mesh.class);
         lightSourceItem.setUserData(LightSource.class);
 
-    }
-
-    public void setUp() {
-        dialogFactory = new DialogFactory(stage, serializationService);//todo DI
-        closeErrorBox();
-        resetFocus();
-        update();
     }
 
     public void updateModel() {
