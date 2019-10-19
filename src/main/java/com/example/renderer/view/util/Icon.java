@@ -31,7 +31,7 @@ public enum Icon {
         return Arrays.stream(values())
                 .filter(icon -> clazz.equals(icon.clazz))
                 .findFirst()
-                .orElseThrow(IllegalStateException::new);//todo java 10
+                .orElseThrow(IllegalArgumentException::new);
     }
 
     public ImageView get() {

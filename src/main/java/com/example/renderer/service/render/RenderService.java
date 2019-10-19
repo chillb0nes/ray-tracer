@@ -14,7 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import java.lang.reflect.Field;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -33,6 +37,14 @@ public class RenderService extends Service<Image> {
         this.cache = CacheBuilder.newBuilder()
                 .expireAfterWrite(5, TimeUnit.MINUTES)
                 .build();
+    }
+
+    @PostConstruct
+    private void init() throws ReflectiveOperationException {
+        final Field EXECUTOR = getClass().getSuperclass().getDeclaredField("EXECUTOR");
+        EXECUTOR.setAccessible(true);
+        ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) EXECUTOR.get(this);
+        setExecutor(Executors.newFixedThreadPool(1, threadPoolExecutor.getThreadFactory()));
     }
 
     public void render(Scene scene) {

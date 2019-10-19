@@ -26,7 +26,6 @@ public class Main extends Application {
         scene.getStylesheets().add("/style.css");
 
         UIController controller = fxmlLoader.getController();
-
         Thread.currentThread().setUncaughtExceptionHandler(controller.getExceptionHandler());
 
         primaryStage.setScene(scene);

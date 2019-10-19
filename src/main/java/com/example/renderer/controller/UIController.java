@@ -22,6 +22,7 @@ import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.geometry.Point3D;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -39,16 +40,17 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.ThreadContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Random;
+import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -56,8 +58,7 @@ import static com.example.renderer.view.util.ObservableUtils.addListener;
 
 @Log4j2
 @Setter
-@Component
-public class UIController {
+public class UIController implements Initializable {
     @FXML
     public HBox root;
     @FXML
@@ -118,9 +119,9 @@ public class UIController {
     private Timeline errorBoxAnimation;
     private File lastSelectedFile;
 
-    @FXML
-    public void initialize() {
-        scene = new Scene();//todo property
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        scene = new Scene();
 
         cameraOriginSpinner.valueProperty().bindBidirectional(scene.cameraOriginProperty());
         aaCheckBox.selectedProperty().bindBidirectional(scene.aaEnabledProperty());
@@ -131,10 +132,7 @@ public class UIController {
         bindMenuWidth();
         bindSelectedItemCenter();
         setMenuItemsUserData();
-        addSceneListeners();
-
-        //todo stage = (Stage) root.getScene().getWindow();
-        dialogFactory.setOwner(stage);
+        addSceneListeners(scene);
 
         renderService.setOnRunning(e -> {
             long startTime = System.currentTimeMillis();
@@ -154,13 +152,13 @@ public class UIController {
         saveBtn.disableProperty().bind(image.imageProperty().isNull());
     }
 
-    private void addSceneListeners() {
+    private void addSceneListeners(Scene scene) {
         addListener(scene.fovProperty(), newValue -> update());
         addListener(scene.aaEnabledProperty(), newValue -> update());
         addListener(scene.cameraOriginProperty(), newValue -> update());
         addListener(scene.selectedProperty(), newValue -> update());
         addListener(scene.getObjects(), change -> update());
-        //addListener(scene.getLights(), change -> update());
+        addListener(scene.getLights(), change -> update());
     }
 
     private void bindFovSlider() {
@@ -257,6 +255,7 @@ public class UIController {
             lastSelectedFile = file.getParentFile();
             String json = new String(Files.readAllBytes(file.toPath()));
             scene = serializationService.fromJson(json, Scene.class);
+            addSceneListeners(scene);
             update();
         }
     }
@@ -306,6 +305,7 @@ public class UIController {
 
     @SuppressWarnings("unchecked")
     public void newObject(Event event) {
+        checkStage();
         MenuItem menuItem = (MenuItem) event.getSource();
         Class<Object3D> userData = (Class<Object3D>) menuItem.getUserData();
         Dialog<Object3D> newDialog = dialogFactory.createNewDialog(userData);
@@ -317,6 +317,7 @@ public class UIController {
     }
 
     public void editObject() {
+        checkStage();
         if (!objectList.getItems().isEmpty()) {
             Object3D selectedItem = selectionModel.getSelectedItem();
             Dialog<Object3D> editDialog = dialogFactory.createEditDialog(selectedItem);
@@ -340,6 +341,13 @@ public class UIController {
         scene.getObjects().clear();
         scene.getLights().clear();
         update();
+    }
+
+    private void checkStage() {
+        if (stage == null) {
+            Stage stage = (Stage) root.getScene().getWindow();
+            dialogFactory.setOwner(stage);
+        }
     }
 
     private void showLoader() {

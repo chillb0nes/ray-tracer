@@ -1,14 +1,11 @@
 package com.example.renderer.view.component;
 
 import com.example.renderer.view.control.CloseButton;
-import com.example.renderer.view.util.NoFocusModel;
-import com.example.renderer.view.util.NoSelectionModel;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.DoubleBinding;
-import javafx.beans.binding.When;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
@@ -29,10 +26,11 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import static com.example.renderer.view.util.ObservableUtils.addListener;
-import static com.example.renderer.view.util.ObservableUtils.onLayoutDone;
 import static javafx.geometry.Pos.CENTER;
 
 public class ExpandableListView<T> extends ListView<T> {
+    private static final double DEFAULT_WIDTH = 200;
+    private double arrowButtonWidth;
     private Bounds cellSize;
     private DoubleBinding cellWidthProperty;
     private Supplier<ValueNode<T>> nodeFactory;
@@ -40,18 +38,15 @@ public class ExpandableListView<T> extends ListView<T> {
 
     public ExpandableListView() {
         this(SimpleValueNode::new);
-        setPrefWidth(200);
+        setPrefWidth(DEFAULT_WIDTH);
     }
 
     public ExpandableListView(Supplier<ValueNode<T>> nodeFactory) {
         this.nodeFactory = nodeFactory;
         this.expandedItems = Sets.newHashSet();
+
         setItems(FXCollections.observableArrayList());
-
         setCellFactory(ExpandableListCell::new);
-
-        setSelectionModel(NoSelectionModel.getInstance());
-        setFocusModel(NoFocusModel.getInstance());
 
         calculateCellSize();
 
@@ -74,29 +69,19 @@ public class ExpandableListView<T> extends ListView<T> {
 
     public ExpandableListView(Collection<? extends T> items) {
         this(items, SimpleValueNode::new);
-        setPrefWidth(200);
+        setPrefWidth(DEFAULT_WIDTH);
     }
 
-    private static TitledPane createTitledPane(EventHandler<ActionEvent> deleteAction) {
+    private TitledPane createTitledPane(EventHandler<ActionEvent> deleteAction) {
         TitledPane titledPane = new TitledPane();
         CloseButton deleteButton = new CloseButton(deleteAction);
 
         BorderPane header = new BorderPane();
         header.setRight(deleteButton);
-        header.setMinWidth(USE_PREF_SIZE);
+        header.prefWidthProperty().bind(titledPane.widthProperty().subtract(arrowButtonWidth));
         BorderPane.setAlignment(deleteButton, CENTER);
 
-        onLayoutDone(header, () -> {
-            Region arrowButton = (Region) titledPane.lookup(".arrow-button");
-            header.prefWidthProperty().bind(titledPane.widthProperty()
-                    .subtract(arrowButton.getWidth())
-                    .subtract(arrowButton.getLayoutX())
-                    .subtract(arrowButton.getPadding().getRight())
-                    .subtract(2));
-        });
-
         titledPane.setGraphic(header);
-        titledPane.setMinWidth(USE_PREF_SIZE);
 
         return titledPane;
     }
@@ -116,6 +101,12 @@ public class ExpandableListView<T> extends ListView<T> {
         root.layout();
 
         cellSize = titledPane.getLayoutBounds();
+
+        Region arrowButton = (Region) titledPane.lookup(".arrow-button");
+        arrowButtonWidth = arrowButton.getWidth()
+                + arrowButton.getLayoutX()
+                + arrowButton.getPadding().getRight()
+                + 2;
     }
 
     private double getScrollBarWidth() {

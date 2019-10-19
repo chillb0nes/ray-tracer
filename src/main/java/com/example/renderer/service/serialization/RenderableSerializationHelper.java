@@ -11,10 +11,10 @@ import org.hildan.fxgson.FxGson;
 
 import java.lang.reflect.Type;
 
-public class RenderableHelper {
+public class RenderableSerializationHelper {
     private static Gson helperGson = FxGson.fullBuilder()
-            .registerTypeAdapter(Point3D.class, Point3DHelper.getSerializer())
-            .registerTypeAdapter(Point3D.class, Point3DHelper.getDeserializer())
+            .registerTypeAdapter(Point3D.class, Point3DSerializationHelper.getSerializer())
+            .registerTypeAdapter(Point3D.class, Point3DSerializationHelper.getDeserializer())
             .create();
 
     public static JsonSerializer<Renderable> getSerializer() {

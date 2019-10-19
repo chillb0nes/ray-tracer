@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import java.lang.reflect.Type;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class Point3DHelper {
+public class Point3DSerializationHelper {
 
     public static JsonSerializer<Point3D> getSerializer() {
         return new Point3DJsonSerializer();

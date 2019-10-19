@@ -6,6 +6,8 @@ import com.example.renderer.model.object.Sphere;
 import com.example.renderer.model.object.Triangle;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.gson.Gson;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonSerializer;
 import javafx.geometry.Point3D;
 import lombok.Getter;
 import org.hildan.fxgson.FxGson;
@@ -20,17 +22,19 @@ public class SerializationService {
     private Gson gson;
 
     public SerializationService() {
+        JsonSerializer<Renderable> renderableSerializer = RenderableSerializationHelper.getSerializer();
+        JsonDeserializer<Renderable> renderableDeserializer = RenderableSerializationHelper.getDeserializer();
         gson = FxGson.fullBuilder()
-                .registerTypeAdapter(Renderable.class, RenderableHelper.getSerializer())
-                .registerTypeAdapter(Renderable.class, RenderableHelper.getDeserializer())
-                .registerTypeAdapter(Sphere.class, RenderableHelper.getSerializer())
-                .registerTypeAdapter(Sphere.class, RenderableHelper.getDeserializer())
-                .registerTypeAdapter(Triangle.class, RenderableHelper.getSerializer())
-                .registerTypeAdapter(Triangle.class, RenderableHelper.getDeserializer())
-                .registerTypeAdapter(Mesh.class, RenderableHelper.getSerializer())
-                .registerTypeAdapter(Mesh.class, RenderableHelper.getDeserializer())
-                .registerTypeAdapter(Point3D.class, Point3DHelper.getSerializer())
-                .registerTypeAdapter(Point3D.class, Point3DHelper.getDeserializer())
+                .registerTypeAdapter(Renderable.class, renderableSerializer)
+                .registerTypeAdapter(Renderable.class, renderableDeserializer)
+                .registerTypeAdapter(Sphere.class, renderableSerializer)
+                .registerTypeAdapter(Sphere.class, renderableDeserializer)
+                .registerTypeAdapter(Triangle.class, renderableSerializer)
+                .registerTypeAdapter(Triangle.class, renderableDeserializer)
+                .registerTypeAdapter(Mesh.class, renderableSerializer)
+                .registerTypeAdapter(Mesh.class, renderableDeserializer)
+                .registerTypeAdapter(Point3D.class, Point3DSerializationHelper.getSerializer())
+                .registerTypeAdapter(Point3D.class, Point3DSerializationHelper.getDeserializer())
                 .setPrettyPrinting()
                 .create();
     }

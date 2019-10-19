@@ -158,12 +158,4 @@ public class DefaultRayTracer implements TaskAwareExecutorRenderer {
                 ? rayHit.getHitPoint().subtract(normal.multiply(shift))
                 : rayHit.getHitPoint().add(normal.multiply(shift));
     }
-
-    private static RayHit getRayHit(Collection<Renderable> objects, Point3D origin, Point3D direction) {
-        return objects.stream()
-                .map(renderable -> renderable.intersection(origin, direction))
-                .filter(RayHit::isHit)
-                .min(Comparator.comparing(RayHit::getDistance))
-                .orElse(RayHit.MISS);
-    }
 }

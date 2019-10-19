@@ -83,6 +83,7 @@ public class Point3DSpinner extends HBox implements ValueNode<Point3D> {
         Label promptText = new Label(text);
         promptText.setDisable(true);
         promptText.prefWidthProperty().bind(spinner.widthProperty().subtract(10));
+        spinner.setPrefWidth(70);
         return new StackPane(spinner, promptText);
     }
 }
