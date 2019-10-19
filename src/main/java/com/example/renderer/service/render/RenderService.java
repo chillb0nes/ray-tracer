@@ -10,10 +10,14 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+@Component
 public class RenderService extends Service<Image> {
 
     private TaskAwareExecutorRenderer renderer;
@@ -21,8 +25,9 @@ public class RenderService extends Service<Image> {
     private Scene scene;
     private Cache<Scene, Image> cache;
 
-    public RenderService(TaskAwareExecutorRenderer renderer,
-                         TaskAwareExecutorRenderer selectionRenderer) {
+    @Autowired
+    public RenderService(@Qualifier("defaultRayTracer") TaskAwareExecutorRenderer renderer,
+                         @Qualifier("outlineRayTracer") TaskAwareExecutorRenderer selectionRenderer) {
         this.renderer = renderer;
         this.selectionRenderer = selectionRenderer;
         this.cache = CacheBuilder.newBuilder()

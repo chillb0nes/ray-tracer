@@ -11,8 +11,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
-import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -21,11 +21,13 @@ import java.util.concurrent.ExecutorService;
 
 import static com.example.renderer.service.render.RayTraceUtils.*;
 
-@Log4j2
-@AllArgsConstructor
+@Component
 public class DefaultRayTracer implements TaskAwareExecutorRenderer {
 
+    @Value("${maxBounceCount}")
     private int maxBounceCount;
+
+    @Value("${backgroundColor}")
     private Color background;
 
     @Override

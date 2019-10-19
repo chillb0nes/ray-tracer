@@ -6,13 +6,18 @@ import com.example.renderer.view.component.dialog.NewDialog;
 import com.example.renderer.model.object.*;
 import javafx.scene.control.Dialog;
 import javafx.stage.Stage;
-import lombok.AllArgsConstructor;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-@AllArgsConstructor
+@Setter
+@Component
 public class DialogFactory {
 
-    private final Stage owner;
-    private final SerializationService serializationService;
+    @Autowired
+    private SerializationService serializationService;
+
+    private Stage owner;
 
     public <T extends Object3D> Dialog<T> createNewDialog(Class<T> clazz) {
         Dialog<T> dialog = new NewDialog<>(clazz);

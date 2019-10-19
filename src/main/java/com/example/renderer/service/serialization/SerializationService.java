@@ -9,9 +9,11 @@ import com.google.gson.Gson;
 import javafx.geometry.Point3D;
 import lombok.Getter;
 import org.hildan.fxgson.FxGson;
+import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Type;
 
+@Component
 public class SerializationService {
 
     @Getter

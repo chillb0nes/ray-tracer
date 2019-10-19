@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 
@@ -13,22 +14,26 @@ public class Main extends Application {
     /*private double xOffset = 0;
     private double yOffset = 0;*/
 
+    @Autowired
+    private FXMLLoader fxmlLoader;
+
     @Override
     public void start(Stage primaryStage) throws IOException {
-        FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("/app.fxml"));
-        Parent root = loader.load();
+        SpringConfiguration.initContext(this);
+        fxmlLoader.setLocation(getClass().getResource("/app.fxml"));
+        Parent root = fxmlLoader.load();
         Scene scene = new Scene(root);
         scene.getStylesheets().add("/style.css");
 
-        UIController controller = loader.getController();
-        controller.setStage(primaryStage);
+        UIController controller = fxmlLoader.getController();
 
         Thread.currentThread().setUncaughtExceptionHandler(controller.getExceptionHandler());
 
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
         primaryStage.setResizable(false);
+        primaryStage.show();
+        root.requestFocus();
 
         /*primaryStage.initStyle(StageStyle.UNDECORATED);
         root.setOnMousePressed(event -> {
@@ -39,10 +44,6 @@ public class Main extends Application {
             primaryStage.setX(event.getScreenX() - xOffset);
             primaryStage.setY(event.getScreenY() - yOffset);
         });*/
-
-        primaryStage.show();
-        controller.setStage(primaryStage);
-        root.requestFocus();
     }
 
     public static void main(String... args) {

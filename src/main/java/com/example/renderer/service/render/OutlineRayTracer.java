@@ -1,28 +1,25 @@
 package com.example.renderer.service.render;
 
 import com.example.renderer.model.Scene;
-import com.example.renderer.model.object.Object3D;
 import com.example.renderer.model.object.Renderable;
 import javafx.concurrent.Task;
 import javafx.geometry.Point3D;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
-import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static com.example.renderer.service.render.RayTraceUtils.getDirectionForPixel;
 
-@Log4j2
+@Component
 public class OutlineRayTracer implements TaskAwareExecutorRenderer {
 
+    @Value("${selectionColor}")
     private Color selection;
-
-    public OutlineRayTracer(Color selection) {
-        this.selection = selection;
-    }
 
     @Override
     public Image getImage(final Scene scene, Task task) throws InterruptedException {

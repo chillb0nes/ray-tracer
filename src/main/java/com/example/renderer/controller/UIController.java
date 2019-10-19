@@ -8,10 +8,7 @@ import com.example.renderer.model.object.Object3D;
 import com.example.renderer.model.object.Sphere;
 import com.example.renderer.model.object.Triangle;
 import com.example.renderer.service.dialog.DialogFactory;
-import com.example.renderer.service.render.DefaultRayTracer;
-import com.example.renderer.service.render.OutlineRayTracer;
 import com.example.renderer.service.render.RenderService;
-import com.example.renderer.service.render.TaskAwareExecutorRenderer;
 import com.example.renderer.service.serialization.SerializationService;
 import com.example.renderer.view.component.InputGroup;
 import com.example.renderer.view.control.Point3DSpinner;
@@ -33,7 +30,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -42,6 +38,8 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.ThreadContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -58,6 +56,7 @@ import static com.example.renderer.view.util.ObservableUtils.addListener;
 
 @Log4j2
 @Setter
+@Component
 public class UIController {
     @FXML
     public HBox root;
@@ -102,20 +101,26 @@ public class UIController {
     @FXML
     private Label errorBoxText;
 
+    @Autowired
+    private RenderService renderService;
+
+    @Autowired
+    private SerializationService serializationService;
+
+    @Autowired
+    private DialogFactory dialogFactory;
+
     private Scene scene;
+    private Stage stage;
     private MultipleSelectionModel<Object3D> selectionModel;
     private ObservableList<Object3D> sceneObjects;
-    private RenderService renderService;
     private ExecutorService loaderPresenter;
-    private DialogFactory dialogFactory;
-    private Stage stage;
     private Timeline errorBoxAnimation;
-    private SerializationService serializationService;
     private File lastSelectedFile;
 
     @FXML
     public void initialize() {
-        scene = new Scene();
+        scene = new Scene();//todo property
 
         cameraOriginSpinner.valueProperty().bindBidirectional(scene.cameraOriginProperty());
         aaCheckBox.selectedProperty().bindBidirectional(scene.aaEnabledProperty());
@@ -128,10 +133,9 @@ public class UIController {
         setMenuItemsUserData();
         addSceneListeners();
 
-        serializationService = new SerializationService();//todo DI
-        TaskAwareExecutorRenderer rayTracer = new DefaultRayTracer(4, Color.LIGHTBLUE);
-        TaskAwareExecutorRenderer outlineRayTracer = new OutlineRayTracer(Color.MAGENTA);
-        renderService = new RenderService(rayTracer, outlineRayTracer);//todo DI
+        //todo stage = (Stage) root.getScene().getWindow();
+        dialogFactory.setOwner(stage);
+
         renderService.setOnRunning(e -> {
             long startTime = System.currentTimeMillis();
             showLoader();
@@ -148,11 +152,6 @@ public class UIController {
         serializationService = new SerializationService();
         lastSelectedFile = new File(System.getProperty("user.home"));
         saveBtn.disableProperty().bind(image.imageProperty().isNull());
-    }
-
-    public void setStage(Stage stage) {
-        this.stage = stage;
-        dialogFactory = new DialogFactory(stage, serializationService);//todo DI
     }
 
     private void addSceneListeners() {
