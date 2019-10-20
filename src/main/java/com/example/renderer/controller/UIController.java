@@ -169,7 +169,6 @@ public class UIController implements Initializable {
             fovSlider.setValue(value);
         });
         fovSlider.setOnScroll(this::changeFovValue);
-        fovSlider.setValue(45);
         fovLabel.textProperty().bind(fovSlider.valueProperty().asString(Locale.US, "%.1f"));
     }
 
@@ -217,7 +216,6 @@ public class UIController implements Initializable {
         triangleItem.setUserData(Triangle.class);
         meshItem.setUserData(Mesh.class);
         lightSourceItem.setUserData(LightSource.class);
-
     }
 
     public void updateModel() {
@@ -248,28 +246,52 @@ public class UIController implements Initializable {
     public void importScene() throws IOException {
         FileChooser fc = new FileChooser();
         fc.setInitialDirectory(lastSelectedFile);
-        fc.getExtensionFilters().add(new ExtensionFilter("JSON", "*.json"));
+        fc.getExtensionFilters().addAll(
+                new ExtensionFilter("JSON", "*.json"),
+                new ExtensionFilter("YAML", "*.yaml", "*.yml")
+        );
         fc.setTitle("Import Scene");
         File file = fc.showOpenDialog(stage);
         if (file != null) {
             lastSelectedFile = file.getParentFile();
-            String json = new String(Files.readAllBytes(file.toPath()));
-            scene = serializationService.fromJson(json, Scene.class);
+            String value = new String(Files.readAllBytes(file.toPath()));
+            String format = fc.getSelectedExtensionFilter().getDescription();
+            switch (format) {
+                case "JSON":
+                    scene = serializationService.fromJson(value, Scene.class);
+                    break;
+                case "YAML":
+                    scene = serializationService.fromYaml(value, Scene.class);
+                    break;
+            }
             addSceneListeners(scene);
             update();
+            log.debug("Loaded current scene from {}", file);
         }
     }
 
     public void exportScene() throws IOException {
         FileChooser fc = new FileChooser();
         fc.setInitialDirectory(lastSelectedFile);
-        fc.getExtensionFilters().add(new ExtensionFilter("JSON", "*.json"));
+        fc.getExtensionFilters().addAll(
+                new ExtensionFilter("JSON", "*.json"),
+                new ExtensionFilter("YAML", "*.yaml", "*.yml")
+        );
         fc.setTitle("Export Scene");
         File file = fc.showSaveDialog(stage);
         if (file != null) {
             lastSelectedFile = file.getParentFile();
-            String json = serializationService.toJson(scene);
-            Files.write(file.toPath(), json.getBytes());
+            String value = "";
+            String format = fc.getSelectedExtensionFilter().getDescription();
+            switch (format) {
+                case "JSON":
+                    value = serializationService.toJson(scene);
+                    break;
+                case "YAML":
+                    value = serializationService.toYaml(scene);
+                    break;
+            }
+            Files.write(file.toPath(), value.getBytes());
             log.debug("Saved current scene to {}", file);
         }
     }
@@ -332,7 +354,7 @@ public class UIController implements Initializable {
     public void deleteObject() {
         if (!objectList.getItems().isEmpty()) {
             Object3D selectedItem = selectionModel.getSelectedItem();
-            scene.deleteObject(selectedItem);
+            scene.removeObject(selectedItem);
         }
     }
 
@@ -401,7 +423,6 @@ public class UIController implements Initializable {
     }
 
     private void generateModel() {
-        scene.getObjects().clear();
         Random random = new Random();
         Sphere sphere1 = new Sphere(new Point3D(0, -1, -7), 0.5, Material.random());
 

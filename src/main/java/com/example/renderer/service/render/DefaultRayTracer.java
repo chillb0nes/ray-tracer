@@ -4,7 +4,6 @@ import com.example.renderer.model.Material;
 import com.example.renderer.model.RayHit;
 import com.example.renderer.model.Scene;
 import com.example.renderer.model.light.LightSource;
-import com.example.renderer.model.object.Renderable;
 import javafx.concurrent.Task;
 import javafx.geometry.Point3D;
 import javafx.scene.image.Image;
@@ -14,15 +13,13 @@ import javafx.scene.paint.Color;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 
 import static com.example.renderer.service.render.RayTraceUtils.*;
 
 @Component
-public class DefaultRayTracer implements TaskAwareExecutorRenderer {
+public class DefaultRayTracer implements TaskAwareRenderer {
 
     @Value("${maxBounceCount}")
     private int maxBounceCount;
@@ -31,7 +28,7 @@ public class DefaultRayTracer implements TaskAwareExecutorRenderer {
     private Color background;
 
     @Override
-    public Image getImage(final Scene scene, Task task) throws InterruptedException {
+    public Image render(final Scene scene, Task task) throws InterruptedException {
         ExecutorService executor = getExecutor();
         WritableImage image = new WritableImage(scene.getWidth(), scene.getHeight());
         PixelWriter writer = image.getPixelWriter();
@@ -44,7 +41,6 @@ public class DefaultRayTracer implements TaskAwareExecutorRenderer {
                 executor.execute(() -> {
                     if (task.isCancelled()) {
                         executor.shutdownNow();
-                        throw new RuntimeException("Task was cancelled");
                     }
                     Color result = castRay(scene, x, y);
                     writer.setColor(x, y, result);
@@ -58,7 +54,8 @@ public class DefaultRayTracer implements TaskAwareExecutorRenderer {
     }
 
     private Color castRay(Scene scene, int x, int y) {
-        Point3D direction = getDirectionForPixel(x, y, scene.getWidth(), scene.getHeight(), scene.getFov());
+        double fov = scene.getFovRadians();
+        Point3D direction = getDirectionForPixel(x, y, scene.getWidth(), scene.getHeight(), fov);
         return castRay(scene, scene.getCameraOrigin(), direction, 0);
     }
 

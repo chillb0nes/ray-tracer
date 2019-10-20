@@ -6,10 +6,12 @@ import javafx.geometry.Point3D;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import static java.lang.Math.sqrt;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Sphere extends Renderable {

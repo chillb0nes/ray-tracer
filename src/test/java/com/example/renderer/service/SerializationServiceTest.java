@@ -63,27 +63,27 @@ public class SerializationServiceTest extends BaseTest {
     public void testSceneSerialization() throws Exception {
         Scene scene = new Scene();
         for (int i = 0; i < random.nextInt(100) + 10; i++) {
-            switch (random.nextInt(4)) {
+            /*switch (random.nextInt(4)) {
                 case 0:
                     Sphere sphere = new Sphere(randomPoint3D(), random.nextDouble());
                     sphere.setMaterial(Material.random());
-                    scene.addObject(sphere);
+                    scene.getObjectsList().add(sphere);
                     break;
                 case 1:
                     Triangle triangle = randomTriangle();
                     triangle.setMaterial(Material.random());
-                    scene.addObject(triangle);
+                    scene.getObjectsList().add(triangle);
                     break;
                 case 2:
                     Mesh mesh = randomMesh();
                     mesh.setMaterial(Material.random());
-                    scene.addObject(mesh);
+                    scene.getObjectsList().add(mesh);
                     break;
                 case 3:
                     LightSource lightSource = new LightSource(randomPoint3D(), random.nextDouble());
-                    scene.addObject(lightSource);
+                    scene.getObjectsList().add(lightSource);
                     break;
-            }
+            }*/
         }
         assertCopyEquals(scene);
     }

@@ -7,6 +7,8 @@ import javafx.scene.paint.Color;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ForkJoinPool;
 import java.util.function.UnaryOperator;
 
 import static java.lang.Math.abs;
@@ -84,4 +86,11 @@ public class RayTraceUtils {
         return value < 0 ? 0 : value > 1 ? 1 : value;
     }
 
+    public static ExecutorService getExecutor() {
+        return new ForkJoinPool(
+                Runtime.getRuntime().availableProcessors(),
+                ForkJoinPool.defaultForkJoinWorkerThreadFactory,
+                (t, e) -> t.interrupt(),
+                true);
+    }
 }

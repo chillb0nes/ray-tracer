@@ -109,16 +109,11 @@ public class BaseTest {
         assertEquals(join(message, "selected"), expected.getSelected(), actual.getSelected());
         assertEquals(join(message, "cameraOrigin"), expected.getCameraOrigin(), actual.getCameraOrigin());
 
-        expected.getObjects().forEach(object3d -> {
-            int i = expected.getObjects().indexOf(object3d);
+         /*expected.getObjectsList().forEach(object3d -> {
+            int i = expected.getObjectsList().indexOf(object3d);
             String join = join(message, String.format("object[%d %s]", i, object3d.getClass()));
-            assertEquals(join, object3d, actual.getObjects().get(i));
-        });
-        expected.getLights().forEach(lightSource -> {
-            int i = expected.getLights().indexOf(lightSource);
-            String join = join(message, String.format("light[%d]", i));
-            assertEquals(join, lightSource, actual.getLights().get(i));
-        });
+            assertEquals(join, object3d, actual.getObjectsList().get(i));
+        });*/
     }
 
     private static String join(String s1, String s2) {

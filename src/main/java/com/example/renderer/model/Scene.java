@@ -3,12 +3,20 @@ package com.example.renderer.model;
 import com.example.renderer.model.light.LightSource;
 import com.example.renderer.model.object.Object3D;
 import com.example.renderer.model.object.Renderable;
+import com.example.renderer.view.util.ObservableUtils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Preconditions;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point3D;
+import javafx.util.Pair;
 import lombok.Data;
+
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Data
 public class Scene {
@@ -21,8 +29,8 @@ public class Scene {
     private ObjectProperty<Point3D> cameraOrigin;
     private transient ObjectProperty<Object3D> selected;
 
-    private ObservableList<Renderable> objects;
-    private ObservableList<LightSource> lights;
+    private final ObservableList<Renderable> objects;
+    private final ObservableList<LightSource> lights;
 
     public Scene() {
         this(640, 480);
@@ -32,7 +40,7 @@ public class Scene {
         this.width = width;
         this.height = height;
 
-        fov = new SimpleDoubleProperty();
+        fov = new SimpleDoubleProperty(45);
         aaEnabled = new SimpleBooleanProperty();
         cameraOrigin = new SimpleObjectProperty<>(Point3D.ZERO);
         selected = new SimpleObjectProperty<>();
@@ -76,7 +84,7 @@ public class Scene {
         }
     }
 
-    public void deleteObject(Object3D object3D) {
+    public void removeObject(Object3D object3D) {
         if (object3D instanceof Renderable) {
             objects.remove(object3D);
         }
@@ -86,7 +94,12 @@ public class Scene {
     }
 
     public double getFov() {
-        return fov.get() * Math.PI / 180;
+        return fov.get();
+    }
+
+    @JsonIgnore
+    public double getFovRadians() {
+        return Math.toRadians(fov.get());
     }
 
     public void setFov(double fov) {
@@ -98,6 +111,10 @@ public class Scene {
     }
 
     public boolean isAaEnabled() {
+        return aaEnabled.get();
+    }
+
+    public boolean getAaEnabled() {
         return aaEnabled.get();
     }
 

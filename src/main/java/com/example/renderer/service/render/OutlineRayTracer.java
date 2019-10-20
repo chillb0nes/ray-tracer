@@ -14,15 +14,16 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static com.example.renderer.service.render.RayTraceUtils.getDirectionForPixel;
+import static com.example.renderer.service.render.RayTraceUtils.getExecutor;
 
 @Component
-public class OutlineRayTracer implements TaskAwareExecutorRenderer {
+public class OutlineRayTracer implements TaskAwareRenderer {
 
     @Value("${selectionColor}")
     private Color selection;
 
     @Override
-    public Image getImage(final Scene scene, Task task) throws InterruptedException {
+    public Image render(final Scene scene, Task task) throws InterruptedException {
         ExecutorService executor = getExecutor();
         WritableImage image = new WritableImage(scene.getWidth(), scene.getHeight());
         for (int j = 0; j < scene.getHeight(); j++) {
@@ -41,6 +42,13 @@ public class OutlineRayTracer implements TaskAwareExecutorRenderer {
         return image;
     }
 
+    private boolean objectHit(Scene scene, int x, int y) {
+        double fov = scene.getFovRadians();
+        Point3D direction = getDirectionForPixel(x, y, scene.getWidth(), scene.getHeight(), fov);
+        return scene.getSelected() instanceof Renderable
+                && ((Renderable) scene.getSelected()).intersection(scene.getCameraOrigin(), direction).isHit();
+    }
+
     private boolean checkEdge(Scene scene, int x, int y) {
         for (int k = -1; k <= 1; k++) {
             for (int l = -1; l <= 1; l++) {
@@ -50,11 +58,5 @@ public class OutlineRayTracer implements TaskAwareExecutorRenderer {
             }
         }
         return false;
-    }
-
-    private boolean objectHit(Scene scene, int x, int y) {
-        Point3D direction = getDirectionForPixel(x, y, scene.getWidth(), scene.getHeight(), scene.getFov());
-        return scene.getSelected() instanceof Renderable
-                && ((Renderable) scene.getSelected()).intersection(scene.getCameraOrigin(), direction).isHit();
     }
 }

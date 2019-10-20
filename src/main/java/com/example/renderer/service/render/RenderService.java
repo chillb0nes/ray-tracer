@@ -1,8 +1,6 @@
 package com.example.renderer.service.render;
 
 import com.example.renderer.model.Scene;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.image.Image;
@@ -14,37 +12,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import java.lang.reflect.Field;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class RenderService extends Service<Image> {
 
-    private TaskAwareExecutorRenderer renderer;
-    private TaskAwareExecutorRenderer selectionRenderer;
+    private TaskAwareRenderer renderer;
+    private TaskAwareRenderer selectionRenderer;
+    private Map<Scene, Image> cache;
     private Scene scene;
-    private Cache<Scene, Image> cache;
 
     @Autowired
-    public RenderService(@Qualifier("defaultRayTracer") TaskAwareExecutorRenderer renderer,
-                         @Qualifier("outlineRayTracer") TaskAwareExecutorRenderer selectionRenderer) {
+    public RenderService(@Qualifier("defaultRayTracer") TaskAwareRenderer renderer,
+                         @Qualifier("outlineRayTracer") TaskAwareRenderer selectionRenderer) {
         this.renderer = renderer;
         this.selectionRenderer = selectionRenderer;
-        this.cache = CacheBuilder.newBuilder()
-                .expireAfterWrite(5, TimeUnit.MINUTES)
-                .build();
-    }
-
-    @PostConstruct
-    private void init() throws ReflectiveOperationException {
-        final Field EXECUTOR = getClass().getSuperclass().getDeclaredField("EXECUTOR");
-        EXECUTOR.setAccessible(true);
-        ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) EXECUTOR.get(this);
-        setExecutor(Executors.newFixedThreadPool(1, threadPoolExecutor.getThreadFactory()));
+        this.cache = new ConcurrentHashMap<>();
     }
 
     public void render(Scene scene) {
@@ -57,12 +41,15 @@ public class RenderService extends Service<Image> {
         return new Task<Image>() {
             @Override
             protected Image call() {
-                try {
-                    Image image = cache.get(scene, () -> renderer.getImage(scene, this));
+                Image image = cache.computeIfAbsent(scene, scene -> renderer.getImage(scene, this));
+                if (image == null || scene.getSelected() == null) {
+                    return image;
+                } else {
                     Image selection = selectionRenderer.getImage(scene, this);
 
                     int width = scene.getWidth();
                     int height = scene.getHeight();
+
                     WritableImage toReturn = new WritableImage(image.getPixelReader(), width, height);
                     PixelReader reader = selection.getPixelReader();
                     PixelWriter writer = toReturn.getPixelWriter();
@@ -76,8 +63,6 @@ public class RenderService extends Service<Image> {
                         }
                     }
                     return toReturn;
-                } catch (ExecutionException | InterruptedException e) {
-                    return null;
                 }
             }
         };

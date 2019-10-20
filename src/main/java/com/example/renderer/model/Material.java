@@ -1,13 +1,18 @@
 package com.example.renderer.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.scene.paint.Color;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Random;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Material {
 
     private Color color;                //цвет
@@ -84,10 +89,12 @@ public class Material {
             .ior(1)
             .build();
 
+    @JsonIgnore
     public boolean isReflective() {
         return reflectivity > 0;
     }
 
+    @JsonIgnore
     public boolean isTranslucent() {
         return transmittance > 0;
     }
