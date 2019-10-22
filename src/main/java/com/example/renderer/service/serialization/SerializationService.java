@@ -64,6 +64,18 @@ public class SerializationService {
         }
     }
 
+    public <T> T fromFile(String file, Class<T> valueType) {
+        try {
+            return objectMapper.readValue(file, valueType);
+        } catch (Exception ex) {
+            try {
+                return yamlMapper.readValue(file, valueType);
+            } catch (IOException e) {
+                throw new UncheckedIOException("Failed to deserialize value", e);
+            }
+        }
+    }
+
     public <T> T copy(T value) {
         try {
             String json = toJson(value);

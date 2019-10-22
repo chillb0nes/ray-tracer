@@ -247,6 +247,7 @@ public class UIController implements Initializable {
         FileChooser fc = new FileChooser();
         fc.setInitialDirectory(lastSelectedFile);
         fc.getExtensionFilters().addAll(
+                new ExtensionFilter("All Files", "*.*"),
                 new ExtensionFilter("JSON", "*.json"),
                 new ExtensionFilter("YAML", "*.yaml", "*.yml")
         );
@@ -257,6 +258,9 @@ public class UIController implements Initializable {
             String value = new String(Files.readAllBytes(file.toPath()));
             String format = fc.getSelectedExtensionFilter().getDescription();
             switch (format) {
+                case "All Files":
+                    scene = serializationService.fromFile(value, Scene.class);
+                    break;
                 case "JSON":
                     scene = serializationService.fromJson(value, Scene.class);
                     break;
