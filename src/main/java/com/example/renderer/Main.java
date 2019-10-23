@@ -7,6 +7,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.io.IOException;
 
@@ -15,12 +17,16 @@ public class Main extends Application {
     private double yOffset = 0;*/
 
     @Autowired
+    private ApplicationContext applicationContext;
+
+    @Autowired
     private FXMLLoader fxmlLoader;
 
     @Override
     public void start(Stage primaryStage) throws IOException {
         SpringConfiguration.initContext(this);
-        fxmlLoader.setLocation(getClass().getResource("/app.fxml"));
+        registerPrimaryStageBean(primaryStage);
+        fxmlLoader.setLocation(getClass().getResource("/fxml/app.fxml"));
         Parent root = fxmlLoader.load();
         Scene scene = new Scene(root);
         scene.getStylesheets().add("/style.css");
@@ -43,6 +49,11 @@ public class Main extends Application {
             primaryStage.setX(event.getScreenX() - xOffset);
             primaryStage.setY(event.getScreenY() - yOffset);
         });*/
+    }
+
+    private void registerPrimaryStageBean(Stage primaryStage) {
+        ((AnnotationConfigApplicationContext) applicationContext)
+                .registerBean("primaryStage", Stage.class, () -> primaryStage);
     }
 
     @Override

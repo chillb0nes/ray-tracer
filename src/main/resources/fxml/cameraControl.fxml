@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.example.renderer.view.component.InputGroup?>
+<?import com.example.renderer.view.control.Point3DSpinner?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<InputGroup fx:id="root" xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.renderer.controller.CameraController" spacing="2" title="Camera controls">
+    <children>
+        <AnchorPane>
+            <Label text="FOV:"/>
+            <Label fx:id="fovLabel" AnchorPane.rightAnchor="0"/>
+        </AnchorPane>
+        <Slider fx:id="fovSlider" blockIncrement="7.5" majorTickUnit="15.0" max="90" minorTickCount="1"
+                showTickMarks="true" snapToTicks="true"/>
+        <Point3DSpinner fx:id="cameraOriginSpinner"/>
+    </children>
+</InputGroup>

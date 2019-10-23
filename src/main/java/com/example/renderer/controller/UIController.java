@@ -7,20 +7,14 @@ import com.example.renderer.model.object.Mesh;
 import com.example.renderer.model.object.Object3D;
 import com.example.renderer.model.object.Sphere;
 import com.example.renderer.model.object.Triangle;
-import com.example.renderer.service.dialog.DialogFactory;
 import com.example.renderer.service.render.RenderService;
-import com.example.renderer.service.serialization.SerializationService;
-import com.example.renderer.view.component.InputGroup;
-import com.example.renderer.view.control.Point3DSpinner;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point3D;
@@ -28,7 +22,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -46,9 +39,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.util.Locale;
-import java.util.Optional;
 import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
@@ -68,72 +58,44 @@ public class UIController implements Initializable {
     @FXML
     private ImageView image;
     @FXML
-    private Label fovLabel;
-    @FXML
-    private Slider fovSlider;
-    @FXML
-    private Point3DSpinner cameraOriginSpinner;
-    @FXML
-    private InputGroup sceneControls;
-    @FXML
-    private Button importBtn;
-    @FXML
-    private Button exportBtn;
-    @FXML
-    private ListView<Object3D> objectList;
-    @FXML
-    private Point3DSpinner objectPosition;
-    @FXML
-    private MenuButton newObjectBtn;
-    @FXML
-    private MenuItem sphereItem;
-    @FXML
-    private MenuItem triangleItem;
-    @FXML
-    private MenuItem meshItem;
-    @FXML
-    private MenuItem lightSourceItem;
-    @FXML
-    private CheckBox aaCheckBox;
-    @FXML
     private Button saveBtn;
     @FXML
     private HBox errorBox;
     @FXML
     private Label errorBoxText;
 
+    @FXML
+    private CameraController cameraController;
+
+    @FXML
+    private SceneController sceneController;
+
     @Autowired
     private RenderService renderService;
 
     @Autowired
-    private SerializationService serializationService;
+    private Stage stage;
 
     @Autowired
-    private DialogFactory dialogFactory;
+    private SceneHolder sceneHolder;
 
-    private Scene scene;
-    private Stage stage;
-    private MultipleSelectionModel<Object3D> selectionModel;
     private ObservableList<Object3D> sceneObjects;
     private ExecutorService loaderPresenter;
     private Timeline errorBoxAnimation;
-    private File lastSelectedFile;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        scene = new Scene();
-
-        cameraOriginSpinner.valueProperty().bindBidirectional(scene.cameraOriginProperty());
-        aaCheckBox.selectedProperty().bindBidirectional(scene.aaEnabledProperty());
-        selectionModel = objectList.getSelectionModel();
+        saveBtn.prefWidthProperty().bind(sceneController.getRoot().widthProperty());
+        saveBtn.disableProperty().bind(image.imageProperty().isNull());
         errorBoxAnimation = slideFromTopAnimation();
 
-        bindFovSlider();
-        bindMenuWidth();
-        bindSelectedItemCenter();
-        setMenuItemsUserData();
-        addSceneListeners(scene);
+        configureRenderService();
 
+        sceneHolder.setScene(new Scene());
+        sceneHolder.registerListener(this::update);
+    }
+
+    private void configureRenderService() {
         renderService.setOnRunning(e -> {
             long startTime = System.currentTimeMillis();
             showLoader();
@@ -147,162 +109,24 @@ public class UIController implements Initializable {
                 return System.currentTimeMillis() - Long.parseLong(start);
             });
         });
-        serializationService = new SerializationService();
-        lastSelectedFile = new File(System.getProperty("user.home"));
-        saveBtn.disableProperty().bind(image.imageProperty().isNull());
-    }
-
-    private void addSceneListeners(Scene scene) {
-        addListener(scene.fovProperty(), newValue -> update());
-        addListener(scene.aaEnabledProperty(), newValue -> update());
-        addListener(scene.cameraOriginProperty(), newValue -> update());
-        addListener(scene.selectedProperty(), newValue -> update());
-        addListener(scene.getObjects(), change -> update());
-        addListener(scene.getLights(), change -> update());
-    }
-
-    private void bindFovSlider() {
-        fovSlider.valueProperty().bindBidirectional(scene.fovProperty());
-        fovSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            double increment = fovSlider.getBlockIncrement();
-            double value = Math.round(newValue.doubleValue() / increment) * increment;
-            fovSlider.setValue(value);
-        });
-        fovSlider.setOnScroll(this::changeFovValue);
-        fovLabel.textProperty().bind(fovSlider.valueProperty().asString(Locale.US, "%.1f"));
-    }
-
-    private void bindMenuWidth() {
-        ReadOnlyDoubleProperty widthProperty = objectPosition.widthProperty();
-        objectList.prefWidthProperty().bind(widthProperty);
-        importBtn.prefWidthProperty().bind(widthProperty.divide(2));
-        exportBtn.prefWidthProperty().bind(widthProperty.divide(2));
-        newObjectBtn.prefWidthProperty().bind(widthProperty);
-        aaCheckBox.prefWidthProperty().bind(widthProperty);
-        saveBtn.prefWidthProperty().bind(sceneControls.widthProperty());
-    }
-
-    private void bindSelectedItemCenter() {
-        scene.selectedProperty().bind(objectList.getSelectionModel().selectedItemProperty());
-
-        addListener(objectPosition.valueProperty(), newValue -> {
-            Object3D selected = scene.getSelected();
-            if (selected != null) {
-                if (!newValue.equals(selected.getCenter())) {
-                    selected.setCenter(newValue);
-                    update();
-                    selectionModel.select(selected);
-                }
-            }
-        });
-
-        addListener(scene.selectedProperty(), selected -> {
-            Point3D center;
-            if (selected != null) {
-                center = selected.getCenter();
-                objectPosition.setDisable(false);
-            } else {
-                center = Point3D.ZERO;
-                objectPosition.setDisable(true);
-            }
-            if (!center.equals(objectPosition.getValue())) {
-                objectPosition.setValue(center);
-            }
-        });
-    }
-
-    private void setMenuItemsUserData() {
-        sphereItem.setUserData(Sphere.class);
-        triangleItem.setUserData(Triangle.class);
-        meshItem.setUserData(Mesh.class);
-        lightSourceItem.setUserData(LightSource.class);
-    }
-
-    public void updateModel() {
-        generateModel();
     }
 
     private void update() {
         sceneObjects = FXCollections.observableArrayList();
-        sceneObjects.addAll(scene.getObjects());
-        sceneObjects.addAll(scene.getLights());
-        objectList.setItems(sceneObjects);
-        renderService.render(scene);
+        sceneObjects.addAll(sceneHolder.getScene().getObjects());
+        sceneObjects.addAll(sceneHolder.getScene().getLights());
+        sceneController.getObjectList().setItems(sceneObjects);
+        renderService.render(sceneHolder.getScene());
     }
 
     public void resetFocus() {
-        objectList.getSelectionModel().clearSelection();
+        sceneController.getObjectList().getSelectionModel().clearSelection();
         root.requestFocus();
-    }
-
-    private void changeFovValue(ScrollEvent scrollEvent) {
-        if (scrollEvent.getTextDeltaY() > 0) {
-            fovSlider.increment();
-        } else {
-            fovSlider.decrement();
-        }
-    }
-
-    public void importScene() throws IOException {
-        FileChooser fc = new FileChooser();
-        fc.setInitialDirectory(lastSelectedFile);
-        fc.getExtensionFilters().addAll(
-                new ExtensionFilter("All Files", "*.*"),
-                new ExtensionFilter("JSON", "*.json"),
-                new ExtensionFilter("YAML", "*.yaml", "*.yml")
-        );
-        fc.setTitle("Import Scene");
-        File file = fc.showOpenDialog(stage);
-        if (file != null) {
-            lastSelectedFile = file.getParentFile();
-            String value = new String(Files.readAllBytes(file.toPath()));
-            String format = fc.getSelectedExtensionFilter().getDescription();
-            switch (format) {
-                case "All Files":
-                    scene = serializationService.fromFile(value, Scene.class);
-                    break;
-                case "JSON":
-                    scene = serializationService.fromJson(value, Scene.class);
-                    break;
-                case "YAML":
-                    scene = serializationService.fromYaml(value, Scene.class);
-                    break;
-            }
-            addSceneListeners(scene);
-            update();
-            log.debug("Loaded current scene from {}", file);
-        }
-    }
-
-    public void exportScene() throws IOException {
-        FileChooser fc = new FileChooser();
-        fc.setInitialDirectory(lastSelectedFile);
-        fc.getExtensionFilters().addAll(
-                new ExtensionFilter("JSON", "*.json"),
-                new ExtensionFilter("YAML", "*.yaml", "*.yml")
-        );
-        fc.setTitle("Export Scene");
-        File file = fc.showSaveDialog(stage);
-        if (file != null) {
-            lastSelectedFile = file.getParentFile();
-            String value = "";
-            String format = fc.getSelectedExtensionFilter().getDescription();
-            switch (format) {
-                case "JSON":
-                    value = serializationService.toJson(scene);
-                    break;
-                case "YAML":
-                    value = serializationService.toYaml(scene);
-                    break;
-            }
-            Files.write(file.toPath(), value.getBytes());
-            log.debug("Saved current scene to {}", file);
-        }
     }
 
     public void saveImage() throws IOException {
         FileChooser fc = new FileChooser();
-        fc.setInitialDirectory(lastSelectedFile);
+        fc.setInitialDirectory(sceneController.getLastSelectedFile());
         fc.getExtensionFilters().addAll(
                 new ExtensionFilter("JPG", "*.jpg", "*.jpeg"),
                 new ExtensionFilter("GIF", "*.gif"),
@@ -311,7 +135,7 @@ public class UIController implements Initializable {
         fc.setTitle("Save Image");
         File file = fc.showSaveDialog(stage);
         if (file != null) {
-            lastSelectedFile = file.getParentFile();
+            sceneController.setLastSelectedFile(file.getParentFile());
             String extension = fc.getSelectedExtensionFilter().getDescription();
             ImageIO.write(toBufferedImage(image.getImage(), extension), extension, file);
             log.debug("Saved current image to {}", file);
@@ -327,53 +151,6 @@ public class UIController implements Initializable {
         BufferedImage bImage1 = new BufferedImage(bImage.getWidth(), bImage.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
         bImage1.getGraphics().drawImage(bImage, 0, 0, null);
         return bImage1;
-    }
-
-    @SuppressWarnings("unchecked")
-    public void newObject(Event event) {
-        checkStage();
-        MenuItem menuItem = (MenuItem) event.getSource();
-        Class<Object3D> userData = (Class<Object3D>) menuItem.getUserData();
-        Dialog<Object3D> newDialog = dialogFactory.createNewDialog(userData);
-        Optional<Object3D> result = newDialog.showAndWait();
-        result.ifPresent(object3D -> {
-            scene.addObject(object3D);
-            objectList.getSelectionModel().select(object3D);
-        });
-    }
-
-    public void editObject() {
-        checkStage();
-        if (!objectList.getItems().isEmpty()) {
-            Object3D selectedItem = selectionModel.getSelectedItem();
-            Dialog<Object3D> editDialog = dialogFactory.createEditDialog(selectedItem);
-            Optional<Object3D> result = editDialog.showAndWait();
-            result.ifPresent(object3D -> {
-                scene.updateObject(selectedItem, object3D);
-                objectList.getSelectionModel().select(object3D);
-            });
-        }
-    }
-
-    public void deleteObject() {
-        if (!objectList.getItems().isEmpty()) {
-            Object3D selectedItem = selectionModel.getSelectedItem();
-            scene.removeObject(selectedItem);
-        }
-    }
-
-    public void clearScene() {
-        scene.setFov(45);
-        scene.getObjects().clear();
-        scene.getLights().clear();
-        update();
-    }
-
-    private void checkStage() {
-        if (stage == null) {
-            Stage stage = (Stage) root.getScene().getWindow();
-            dialogFactory.setOwner(stage);
-        }
     }
 
     private void showLoader() {
@@ -426,7 +203,8 @@ public class UIController implements Initializable {
         log.debug("Mouse click at {}:{}", (int) e.getSceneX(), (int) e.getSceneY());
     }
 
-    private void generateModel() {
+    public void generateScene() {
+        Scene scene = new Scene();
         Random random = new Random();
         Sphere sphere1 = new Sphere(new Point3D(0, -1, -7), 0.5, Material.random());
 
@@ -459,11 +237,11 @@ public class UIController implements Initializable {
                 new Point3D(-2, -1, -5),
                 Material.IVORY);
 
-        Mesh mesh1 = new Mesh();
+        Mesh mesh1 = new Mesh(triangle2, triangle3);
 
         scene.getObjects().setAll(
                 sphere1, sphere2, sphere3, sphere4, sphere5, sphere6, sphere7, sphere8,
-                triangle1, triangle2, triangle3,
+                triangle1,
                 mesh1);
 
         LightSource light1 = new LightSource(new Point3D(0, 5, 5), random.nextDouble());
@@ -471,5 +249,6 @@ public class UIController implements Initializable {
         LightSource light3 = new LightSource(new Point3D(5, 1, 0), random.nextDouble());
 
         scene.getLights().setAll(light1, light2, light3);
+        sceneHolder.setScene(scene);
     }
 }

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.example.renderer.view.component.InputGroup?>
+<?import com.example.renderer.view.component.Object3DCellFactory?>
+<?import com.example.renderer.view.control.Point3DSpinner?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<InputGroup fx:id="root" xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.renderer.controller.SceneController" title="Scene controls">
+    <children>
+        <VBox>
+            <HBox>
+                <Button fx:id="importBtn" mnemonicParsing="false" onAction="#importScene"
+                        text="Import"/>
+                <Button fx:id="exportBtn" mnemonicParsing="false" onAction="#exportScene"
+                        text="Export "/>
+            </HBox>
+            <ListView fx:id="objectList" prefHeight="100">
+                <cellFactory>
+                    <Object3DCellFactory/>
+                </cellFactory>
+                <contextMenu>
+                    <ContextMenu>
+                        <items>
+                            <MenuItem onAction="#editObject" text="Edit"/>
+                            <MenuItem onAction="#deleteObject" text="Delete"/>
+                            <SeparatorMenuItem mnemonicParsing="false"/>
+                            <MenuItem onAction="#clearScene" text="Clear"/>
+                        </items>
+                    </ContextMenu>
+                </contextMenu>
+            </ListView>
+        </VBox>
+        <Point3DSpinner fx:id="objectPosition" disable="true"/>
+        <MenuButton fx:id="newObjectBtn" mnemonicParsing="false" popupSide="LEFT" text="New object">
+            <items>
+                <MenuItem fx:id="sphereItem" mnemonicParsing="false" onAction="#newObject"
+                          text="Sphere"/>
+                <MenuItem fx:id="triangleItem" mnemonicParsing="false" onAction="#newObject"
+                          text="Triangle"/>
+                <MenuItem fx:id="meshItem" mnemonicParsing="false" onAction="#newObject" text="Mesh"/>
+                <MenuItem fx:id="lightSourceItem" mnemonicParsing="false" onAction="#newObject"
+                          text="Light Source"/>
+            </items>
+        </MenuButton>
+        <CheckBox fx:id="aaCheckBox" mnemonicParsing="false" text="Enable antialiasing"/>
+    </children>
+</InputGroup>
