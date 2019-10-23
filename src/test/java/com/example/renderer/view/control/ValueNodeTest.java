@@ -121,6 +121,7 @@ public class ValueNodeTest extends BaseJavaFXTest {
         assertEquals(mesh.getTriangles(), control.getListView().getItems());
 
         control.setDefaultValue();
+        mesh = randomMesh();
         control.getListView().setItems(mesh.getTriangles());
         assertEquals(mesh.getTriangles(), control.getValue().getTriangles());
 
