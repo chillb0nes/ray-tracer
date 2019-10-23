@@ -223,21 +223,19 @@ public class UIController implements Initializable {
                 new Point3D(0, 1, -7),
                 new Point3D(2, -1, -5),
                 new Point3D(1, 2, -6),
-                Material.RUBBER);
+                Material.random());
 
         Triangle triangle2 = new Triangle(
                 new Point3D(0, 1, -7),
                 new Point3D(-1, 2, -6),
-                new Point3D(-2, -1, -5),
-                Material.RUBBER);
+                new Point3D(-2, -1, -5));
 
         Triangle triangle3 = new Triangle(
                 new Point3D(0, 1, -7),
                 new Point3D(2, -1, -5),
-                new Point3D(-2, -1, -5),
-                Material.IVORY);
+                new Point3D(-2, -1, -5));
 
-        Mesh mesh1 = new Mesh(triangle2, triangle3);
+        Mesh mesh1 = new Mesh(Material.random(), triangle2, triangle3);
 
         scene.getObjects().setAll(
                 sphere1, sphere2, sphere3, sphere4, sphere5, sphere6, sphere7, sphere8,

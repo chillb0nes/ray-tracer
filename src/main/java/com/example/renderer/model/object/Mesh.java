@@ -2,6 +2,7 @@ package com.example.renderer.model.object;
 
 import com.example.renderer.model.Material;
 import com.example.renderer.model.RayHit;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -13,6 +14,7 @@ import javafx.geometry.Point3D;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Comparator.comparing;
@@ -33,7 +35,7 @@ public class Mesh extends Renderable {
     }
 
     public Mesh(Triangle... triangles) {
-        setTriangles(FXCollections.observableArrayList(triangles));
+        this(Arrays.asList(triangles));
     }
 
     public Mesh(Material material) {
@@ -60,6 +62,7 @@ public class Mesh extends Renderable {
                 .orElse(RayHit.MISS);
     }
 
+    @JsonIgnore
     public Point3D getCenter() {
         return center.get();
     }

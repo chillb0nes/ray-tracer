@@ -70,6 +70,9 @@ public class DefaultRayTracer implements TaskAwareRenderer {
         }
 
         Material material = rayHit.getHitObject().getMaterial();
+        if (material == null) {
+            return background;
+        }
         Color reflectionColor = background;
         Color refractionColor = background;
 

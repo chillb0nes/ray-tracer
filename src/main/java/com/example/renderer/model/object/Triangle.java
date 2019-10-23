@@ -2,6 +2,7 @@ package com.example.renderer.model.object;
 
 import com.example.renderer.model.Material;
 import com.example.renderer.model.RayHit;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -165,6 +166,7 @@ public class Triangle extends Renderable {
         this.v2.set(v2);
     }
 
+    @JsonIgnore
     public Point3D getCenter() {
         return center.get();
     }
