@@ -11,12 +11,12 @@
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.renderer.controller.SceneController" title="Scene controls">
     <children>
-        <HBox spacing="5" fx:id="widthHeightContainer">
-            <HBox alignment="BASELINE_CENTER">
+        <HBox fx:id="widthHeightContainer">
+            <HBox fx:id="widthContainer" alignment="BASELINE_CENTER">
                 <Label styleClass="button-label" text="W:" minWidth="-Infinity"/>
                 <TextField fx:id="widthField" minWidth="0"/>
             </HBox>
-            <HBox alignment="BASELINE_CENTER">
+            <HBox fx:id="heightContainer" alignment="BASELINE_CENTER">
                 <Label styleClass="button-label" text="H:" minWidth="-Infinity"/>
                 <TextField fx:id="heightField" minWidth="0"/>
             </HBox>

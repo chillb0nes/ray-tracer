@@ -11,16 +11,26 @@
     -fx-scale-y: $y
 
 * > *
-    -fx-accent: #3399FF
+    -fx-accent: #00A8E8
     -fx-faint-focus-color: transparent
     -fx-focus-color: -fx-accent
     -fx-default-button: #ececec
-    //-fx-background-radius: 0
-    //-fx-focus-traversable: false
-    //-fx-body-color: derive(-fx-color,-5%)
 
-.root
-    -fx-background-color: -fx-background
+.button,
+.menu-button,
+.text-field,
+.check-box .box,
+.slider *,
+.scroll-bar *,
+.spinner, .spinner *,
+.titled-pane *,
+.color-picker,
+.color-palette,
+.custom-color-dialog .toggle-button,
+.customcolor-controls-background
+    -fx-background-radius: 0
+    &:focused
+        -fx-background-radius: 0
 
 .error-notification
     -fx-background-color: #dc3545dd
@@ -45,8 +55,12 @@
     -fx-border-color: -fx-box-border
     -fx-border-width: 1px 0px 1px 1px
 
-.spinner .increment-arrow-button, .decrement-arrow-button
-    -fx-padding: 1 2
+.cell:hover
+    -fx-background-color: -fx-accent
+
+.spinner
+    .increment-arrow-button, .decrement-arrow-button
+        -fx-padding: 1 2
 
 .color-palette .hyperlink
     -fx-border-color: transparent
@@ -66,21 +80,21 @@
         -fx-background-image: url('/icons/slider.png')
         -fx-pref-width: 11px
         -fx-pref-height: 21px
-    &:focused .thumb
+    /*&:focused .thumb
         -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-body-color, -fx-body-color
-        -fx-background-insets: 0, 1, 2, 2, 1
+        -fx-background-insets: 0, 1, 2, 2, 1*/
 
 .scroll-bar
     &:vertical
         .thumb
-            //-fx-background-color: -fx-box-border
+            -fx-background-color: -fx-box-border
         .increment-button .increment-arrow
             -fx-shape: "M 0 0 h 7 l -3.5 4 z"
         .decrement-button .decrement-arrow
             -fx-shape: "M 0 0 h 7 l -3.5 -4 z"
     &:horizontal
         .thumb
-            //-fx-background-color: -fx-box-border
+            -fx-background-color: -fx-box-border
         .increment-button .increment-arrow
             -fx-shape: "M 0 0 v 7 l 4 -3.5 z"
         .decrement-button .decrement-arrow

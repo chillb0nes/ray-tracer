@@ -42,6 +42,10 @@ public class SceneController implements Initializable {
     @FXML
     public HBox widthHeightContainer;
     @FXML
+    public HBox widthContainer;
+    @FXML
+    public HBox heightContainer;
+    @FXML
     public TextField widthField;
     @FXML
     public TextField heightField;
@@ -95,6 +99,8 @@ public class SceneController implements Initializable {
 
         ReadOnlyDoubleProperty widthProperty = objectPosition.widthProperty();
         widthHeightContainer.prefWidthProperty().bind(widthProperty);
+        widthContainer.prefWidthProperty().bind(widthProperty.divide(2));
+        heightContainer.prefWidthProperty().bind(widthProperty.divide(2));
         objectList.prefWidthProperty().bind(widthProperty);
         importBtn.prefWidthProperty().bind(widthProperty.divide(2));
         exportBtn.prefWidthProperty().bind(widthProperty.divide(2));
