@@ -10,12 +10,14 @@ import com.example.renderer.service.dialog.DialogFactory;
 import com.example.renderer.service.serialization.SerializationService;
 import com.example.renderer.view.component.InputGroup;
 import com.example.renderer.view.control.Point3DSpinner;
+import com.example.renderer.view.util.NumberStringConverter;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point3D;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lombok.Getter;
@@ -37,6 +39,12 @@ import static com.example.renderer.view.util.ObservableUtils.addListener;
 public class SceneController implements Initializable {
     @FXML
     private InputGroup root;
+    @FXML
+    public HBox widthHeightContainer;
+    @FXML
+    public TextField widthField;
+    @FXML
+    public TextField heightField;
     @FXML
     private Button importBtn;
     @FXML
@@ -73,6 +81,7 @@ public class SceneController implements Initializable {
     private MultipleSelectionModel<Object3D> selectionModel;
     @Setter
     private File lastSelectedFile;
+    private NumberStringConverter<Number> numberStringConverter;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -80,7 +89,12 @@ public class SceneController implements Initializable {
         lastSelectedFile = new File(System.getProperty("user.home"));
         dialogFactory.setOwner(stage);
 
+        numberStringConverter = new NumberStringConverter<>(Double::valueOf);
+        widthField.setTextFormatter(positiveTextFormatter());
+        heightField.setTextFormatter(positiveTextFormatter());
+
         ReadOnlyDoubleProperty widthProperty = objectPosition.widthProperty();
+        widthHeightContainer.prefWidthProperty().bind(widthProperty);
         objectList.prefWidthProperty().bind(widthProperty);
         importBtn.prefWidthProperty().bind(widthProperty.divide(2));
         exportBtn.prefWidthProperty().bind(widthProperty.divide(2));
@@ -91,10 +105,30 @@ public class SceneController implements Initializable {
         addListener(sceneHolder.sceneProperty(), this::resetBindings);
     }
 
+    private void setMenuItemsUserData() {
+        sphereItem.setUserData(Sphere.class);
+        triangleItem.setUserData(Triangle.class);
+        meshItem.setUserData(Mesh.class);
+        lightSourceItem.setUserData(LightSource.class);
+    }
+
+    private TextFormatter<Number> positiveTextFormatter() {
+        return new TextFormatter<>(numberStringConverter, null,
+                change -> {
+                    change.setText(change.getText().replace("-", ""));
+                    return change;
+                });
+    }
+
     private void resetBindings(Scene scene) {
         aaCheckBox.selectedProperty().bindBidirectional(scene.aaEnabledProperty());
-        scene.selectedProperty().bind(objectList.getSelectionModel().selectedItemProperty());
+        widthField.textProperty().bindBidirectional(scene.widthProperty(), numberStringConverter);
+        heightField.textProperty().bindBidirectional(scene.heightProperty(), numberStringConverter);
+        bindObjectPosition(scene);
+    }
 
+    private void bindObjectPosition(Scene scene) {
+        scene.selectedProperty().bind(objectList.getSelectionModel().selectedItemProperty());
         addListener(objectPosition.valueProperty(), newValue -> {
             Object3D selected = scene.getSelected();
             if (selected != null) {
@@ -118,13 +152,6 @@ public class SceneController implements Initializable {
                 objectPosition.setValue(center);
             }
         });
-    }
-
-    private void setMenuItemsUserData() {
-        sphereItem.setUserData(Sphere.class);
-        triangleItem.setUserData(Triangle.class);
-        meshItem.setUserData(Mesh.class);
-        lightSourceItem.setUserData(LightSource.class);
     }
 
     public void importScene() throws IOException {

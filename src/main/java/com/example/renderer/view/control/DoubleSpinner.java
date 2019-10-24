@@ -1,35 +1,18 @@
 package com.example.renderer.view.control;
 
 import com.example.renderer.view.component.ValueNode;
+import com.example.renderer.view.util.NumberStringConverter;
 import javafx.beans.NamedArg;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory;
 import javafx.util.StringConverter;
 
-import java.util.Locale;
+import java.util.function.Function;
 
 import static javafx.geometry.Pos.BASELINE_RIGHT;
 
 public class DoubleSpinner extends Spinner<Double> implements ValueNode<Double> {
-    private static final String DECIMAL_REGEX = "-?\\d+(\\.\\d+)?";
-    private static final StringConverter<Double> STRING_CONVERTER = new StringConverter<Double>() {
-        @Override
-        public String toString(Double number) {
-            if (number == null) {
-                return "";
-            }
-            return String.format(Locale.US, "%.2f", number);
-        }
-
-        @Override
-        public Double fromString(String number) {
-            if (number == null) {
-                return null;
-            }
-            return number.matches(DECIMAL_REGEX) ? Double.parseDouble(number) : 0;
-        }
-    };
 
     public DoubleSpinner() {
         this(-Double.MAX_VALUE, Double.MAX_VALUE);
@@ -45,7 +28,7 @@ public class DoubleSpinner extends Spinner<Double> implements ValueNode<Double> 
     private SpinnerValueFactory<Double> createValueFactory(double min, double max) {
         SpinnerValueFactory<Double> spinnerValueFactory;
         spinnerValueFactory = new DoubleSpinnerValueFactory(min, max, 0, 0.01);
-        spinnerValueFactory.setConverter(STRING_CONVERTER);
+        spinnerValueFactory.setConverter(new NumberStringConverter<>(Double::valueOf));
         return spinnerValueFactory;
     }
 

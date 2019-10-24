@@ -3,27 +3,21 @@ package com.example.renderer.model;
 import com.example.renderer.model.light.LightSource;
 import com.example.renderer.model.object.Object3D;
 import com.example.renderer.model.object.Renderable;
-import com.example.renderer.view.util.ObservableUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Preconditions;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point3D;
-import javafx.util.Pair;
 import lombok.Data;
-
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import lombok.extern.log4j.Log4j2;
 
 @Data
+@Log4j2
 public class Scene {
 
-    private final int width;
-    private final int height;
-
+    private IntegerProperty width;
+    private IntegerProperty height;
     private DoubleProperty fov;
     private BooleanProperty aaEnabled;
     private ObjectProperty<Point3D> cameraOrigin;
@@ -37,8 +31,8 @@ public class Scene {
     }
 
     public Scene(int width, int height) {
-        this.width = width;
-        this.height = height;
+        this.width = new SimpleIntegerProperty(width);
+        this.height = new SimpleIntegerProperty(height);
 
         fov = new SimpleDoubleProperty(45);
         aaEnabled = new SimpleBooleanProperty();
@@ -50,11 +44,27 @@ public class Scene {
     }
 
     public int getWidth() {
-        return aaEnabled.get() ? width * 2 : width;
+        return isAaEnabled() ? width.get() * 2 : width.get();
     }
 
     public int getHeight() {
-        return aaEnabled.get() ? height * 2 : height;
+        return isAaEnabled() ? height.get() * 2 : height.get();
+    }
+
+    public IntegerProperty widthProperty() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width.set(width);
+    }
+
+    public IntegerProperty heightProperty() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height.set(height);
     }
 
     public void addObject(Object3D object3D) {

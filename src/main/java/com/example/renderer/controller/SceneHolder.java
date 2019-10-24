@@ -3,6 +3,7 @@ package com.example.renderer.controller;
 import com.example.renderer.model.Scene;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
 import java.util.LinkedList;
@@ -10,6 +11,7 @@ import java.util.List;
 
 import static com.example.renderer.view.util.ObservableUtils.addListener;
 
+@Log4j2
 @Component
 public class SceneHolder {
     private ObjectProperty<Scene> scene;
@@ -35,6 +37,8 @@ public class SceneHolder {
     }
 
     private void addSceneListeners(Scene scene) {
+        addListener(scene.widthProperty(), newValue -> requestUpdate());
+        addListener(scene.heightProperty(), newValue -> requestUpdate());
         addListener(scene.fovProperty(), newValue -> requestUpdate());
         addListener(scene.aaEnabledProperty(), newValue -> requestUpdate());
         addListener(scene.cameraOriginProperty(), newValue -> requestUpdate());
@@ -48,6 +52,7 @@ public class SceneHolder {
     }
 
     public void requestUpdate() {
+        log.trace("Update requested, running {} listeners", listeners.size());
         listeners.forEach(Runnable::run);
     }
 }
