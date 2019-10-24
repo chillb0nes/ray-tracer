@@ -104,10 +104,18 @@ public class UIController implements Initializable {
         renderService.setOnSucceeded(e -> {
             image.setImage(renderService.getValue());
             hideLoader();
-            log.trace("Image is rendered in {}ms", () -> {
+            log.debug("Image is rendered in {}ms", () -> {
                 String start = ThreadContext.pop();
                 return System.currentTimeMillis() - Long.parseLong(start);
             });
+        });
+        renderService.setOnCancelled(e -> {
+            log.trace("Render task cancelled");
+            hideLoader();
+        });
+        renderService.setOnFailed(e -> {
+            log.error("Render task failed", renderService.getException());
+            hideLoader();
         });
     }
 
@@ -167,7 +175,9 @@ public class UIController implements Initializable {
 
     private void hideLoader() {
         loader.setVisible(false);
-        loaderPresenter.shutdownNow();
+        if (loaderPresenter != null) {
+            loaderPresenter.shutdownNow();
+        }
     }
 
     public void closeErrorBox() {
@@ -206,7 +216,8 @@ public class UIController implements Initializable {
     public void generateScene() {
         Scene scene = new Scene();
         Random random = new Random();
-        Sphere sphere1 = new Sphere(new Point3D(0, -1, -7), 0.5, Material.random());
+        //new Sphere(new Point3D())
+        /*Sphere sphere1 = new Sphere(new Point3D(0, -1, -7), 0.5, Material.random());
 
         Sphere sphere2 = new Sphere(new Point3D(1, -1, -6), 0.5, Material.random());
         Sphere sphere3 = new Sphere(new Point3D(2, -1, -5), 0.5, Material.random());
@@ -246,7 +257,7 @@ public class UIController implements Initializable {
         LightSource light2 = new LightSource(new Point3D(-2, 2, 2), random.nextDouble());
         LightSource light3 = new LightSource(new Point3D(5, 1, 0), random.nextDouble());
 
-        scene.getLights().setAll(light1, light2, light3);
+        scene.getLights().setAll(light1, light2, light3);*/
         sceneHolder.setScene(scene);
     }
 }
