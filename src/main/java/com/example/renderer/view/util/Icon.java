@@ -2,7 +2,6 @@ package com.example.renderer.view.util;
 
 import com.example.renderer.model.light.LightSource;
 import com.example.renderer.model.object.Mesh;
-import com.example.renderer.model.object.Object3D;
 import com.example.renderer.model.object.Sphere;
 import com.example.renderer.model.object.Triangle;
 import javafx.scene.image.Image;
@@ -16,12 +15,11 @@ import java.util.Arrays;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public enum Icon {
-    LIGHT_SOURCE(new Image("/icons/icons8-light-on-filled-24.png"), LightSource.class),
-    SPHERE      (new Image("/icons/icons8-sphere-24.png"), Sphere.class),
-    TRIANGLE    (new Image("/icons/icons8-triangle-filled-30.png"), Triangle.class),
-    MESH        (new Image("/icons/icons8-orthogonal-view-filled-24.png"), Mesh.class),
-    ADD         (new Image("/icons/icons8-сложение-90.png"))
-    ;
+    LIGHT_SOURCE(new Image("/icons/light.png"), LightSource.class),
+    SPHERE      (new Image("/icons/sphere.png"), Sphere.class),
+    TRIANGLE    (new Image("/icons/triangle.png"), Triangle.class),
+    MESH        (new Image("/icons/mesh.png"), Mesh.class),
+    ADD         (new Image("/icons/plus.png"));
 
     @Getter
     private final Image image;

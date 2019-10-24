@@ -14,14 +14,20 @@ import java.util.Random;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Material {
-
-    private Color color;                //цвет
-    private double diffuse;             //сколько света возвращается
-    private double specular;            //насколько яркий блик
-    private double reflectivity;        //отражательная способность
-    private double transmittance;       //прозрачность
-    private double specularExp;         //размер блика
-    private double ior;                 //показатель преломления
+    /** Diffuse color */
+    private Color color;
+    /** Amount of reflected light */
+    private double diffuse;
+    /** Highlight brightness */
+    private double specular;
+    /** Reflection brightness */
+    private double reflectivity;
+    /** Amount of transmitted light */
+    private double transmittance;
+    /** Highlight size */
+    private double specularExp;
+    /** Index of Refraction */
+    private double ior;
 
     public static Material random() {
         Random random = new Random();
@@ -53,7 +59,7 @@ public class Material {
             .color(Color.IVORY)
             .diffuse(0.6)
             .specular(0.3)
-            .reflectivity(0.1)
+            .reflectivity(0.01)
             .transmittance(0)
             .specularExp(50)
             .ior(1)
