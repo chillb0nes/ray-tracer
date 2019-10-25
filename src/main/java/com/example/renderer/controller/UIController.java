@@ -21,6 +21,7 @@ import javafx.geometry.Point3D;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -91,8 +92,17 @@ public class UIController implements Initializable {
 
         configureRenderService();
 
+        root.setOnKeyPressed(keyEvent -> {
+            if (keyEvent.isControlDown()
+                    && keyEvent.isAltDown()
+                    && KeyCode.Z == keyEvent.getCode()) {
+                generateScene();
+            }
+        });
+
         sceneHolder.setScene(new Scene());
         sceneHolder.registerListener(this::update);
+        sceneHolder.requestUpdate();
     }
 
     private void configureRenderService() {
@@ -213,11 +223,10 @@ public class UIController implements Initializable {
         log.debug("Mouse click at {}:{}", (int) e.getSceneX(), (int) e.getSceneY());
     }
 
-    public void generateScene() {
+    private void generateScene() {
         Scene scene = new Scene();
         Random random = new Random();
-        //new Sphere(new Point3D())
-        /*Sphere sphere1 = new Sphere(new Point3D(0, -1, -7), 0.5, Material.random());
+        Sphere sphere1 = new Sphere(new Point3D(0, -1, -7), 0.5, Material.random());
 
         Sphere sphere2 = new Sphere(new Point3D(1, -1, -6), 0.5, Material.random());
         Sphere sphere3 = new Sphere(new Point3D(2, -1, -5), 0.5, Material.random());
@@ -248,16 +257,15 @@ public class UIController implements Initializable {
 
         Mesh mesh1 = new Mesh(Material.random(), triangle2, triangle3);
 
-        scene.getObjects().setAll(
-                sphere1, sphere2, sphere3, sphere4, sphere5, sphere6, sphere7, sphere8,
-                triangle1,
-                mesh1);
-
         LightSource light1 = new LightSource(new Point3D(0, 5, 5), random.nextDouble());
         LightSource light2 = new LightSource(new Point3D(-2, 2, 2), random.nextDouble());
         LightSource light3 = new LightSource(new Point3D(5, 1, 0), random.nextDouble());
 
-        scene.getLights().setAll(light1, light2, light3);*/
+        scene.addObjects(
+                sphere1, sphere2, sphere3, sphere4, sphere5, sphere6, sphere7, sphere8,
+                triangle1, triangle2, triangle3,
+                mesh1,
+                light1, light2, light3);
         sceneHolder.setScene(scene);
     }
 }
