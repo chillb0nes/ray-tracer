@@ -201,7 +201,7 @@ public class SceneController implements Initializable {
         fc.setInitialDirectory(lastSelectedFile);
         fc.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("JSON", "*.json"),
-                new FileChooser.ExtensionFilter("YAML", "*.yaml", "*.yml")
+                new FileChooser.ExtensionFilter("YAML", "*.yml", "*.yaml")
         );
         fc.setTitle("Export Scene");
         File file = fc.showSaveDialog(stage);

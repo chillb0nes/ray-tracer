@@ -1,0 +1,256 @@
+---
+width: 640
+height: 480
+fov: 45.0
+aaEnabled: false
+cameraOrigin:
+  x: 0.0
+  y: 0.0
+  z: 0.0
+objects:
+- !<sphere>
+  material:
+    color: "#fffff0ff"
+    diffuse: 0.6
+    specular: 0.3
+    reflectivity: 0.01
+    transmittance: 0.0
+    specularExp: 50.0
+    ior: 1.0
+  center:
+    x: 0.0
+    y: -1.0
+    z: -7.0
+  radius: 0.5
+- !<sphere>
+  material:
+    color: "#808080ff"
+    diffuse: 0.5
+    specular: 0.25
+    reflectivity: 0.0
+    transmittance: 0.0
+    specularExp: 50.0
+    ior: 1.0
+  center:
+    x: 1.0
+    y: -1.0
+    z: -6.0
+  radius: 0.5
+- !<sphere>
+  material:
+    color: "#b22222ff"
+    diffuse: 0.9
+    specular: 0.1
+    reflectivity: 0.0
+    transmittance: 0.0
+    specularExp: 10.0
+    ior: 1.0
+  center:
+    x: 2.0
+    y: -1.0
+    z: -5.0
+  radius: 0.5
+- !<sphere>
+  material:
+    color: "#808080ff"
+    diffuse: 0.5
+    specular: 0.25
+    reflectivity: 0.0
+    transmittance: 0.0
+    specularExp: 50.0
+    ior: 1.0
+  center:
+    x: -1.0
+    y: -1.0
+    z: -6.0
+  radius: 0.5
+- !<sphere>
+  material:
+    color: "#ffffffff"
+    diffuse: 0.1
+    specular: 10.0
+    reflectivity: 0.8
+    transmittance: 0.0
+    specularExp: 1425.0
+    ior: 1.0
+  center:
+    x: -2.0
+    y: -1.0
+    z: -5.0
+  radius: 0.5
+- !<sphere>
+  material:
+    color: "#808080ff"
+    diffuse: 0.5
+    specular: 0.25
+    reflectivity: 0.0
+    transmittance: 0.0
+    specularExp: 50.0
+    ior: 1.0
+  center:
+    x: 0.0
+    y: 0.0
+    z: -7.0
+  radius: 0.5
+- !<sphere>
+  material:
+    color: "#fffff0ff"
+    diffuse: 0.6
+    specular: 0.3
+    reflectivity: 0.01
+    transmittance: 0.0
+    specularExp: 50.0
+    ior: 1.0
+  center:
+    x: 0.0
+    y: 1.0
+    z: -7.0
+  radius: 0.5
+- !<sphere>
+  material:
+    color: "#b0e0e6ff"
+    diffuse: 0.2
+    specular: 0.5
+    reflectivity: 0.1
+    transmittance: 0.8
+    specularExp: 125.0
+    ior: 1.5
+  center:
+    x: 0.0
+    y: 0.0
+    z: -3.0
+  radius: 0.5
+- !<triangle>
+  material:
+    color: "#b22222ff"
+    diffuse: 0.9
+    specular: 0.1
+    reflectivity: 0.0
+    transmittance: 0.0
+    specularExp: 10.0
+    ior: 1.0
+  v0:
+    x: 0.0
+    y: 1.0
+    z: -7.0
+  v1:
+    x: 2.0
+    y: -1.0
+    z: -5.0
+  v2:
+    x: 1.0
+    y: 2.0
+    z: -6.0
+- !<triangle>
+  material:
+    color: "#b0e0e6ff"
+    diffuse: 0.2
+    specular: 0.5
+    reflectivity: 0.1
+    transmittance: 0.8
+    specularExp: 125.0
+    ior: 1.5
+  v0:
+    x: 0.0
+    y: 1.0
+    z: -7.0
+  v1:
+    x: -1.0
+    y: 2.0
+    z: -6.0
+  v2:
+    x: -2.0
+    y: -1.0
+    z: -5.0
+- !<triangle>
+  material:
+    color: "#b0e0e6ff"
+    diffuse: 0.2
+    specular: 0.5
+    reflectivity: 0.1
+    transmittance: 0.8
+    specularExp: 125.0
+    ior: 1.5
+  v0:
+    x: 0.0
+    y: 1.0
+    z: -7.0
+  v1:
+    x: 2.0
+    y: -1.0
+    z: -5.0
+  v2:
+    x: -2.0
+    y: -1.0
+    z: -5.0
+- !<mesh>
+  material:
+    color: "#b0e0e6ff"
+    diffuse: 0.2
+    specular: 0.5
+    reflectivity: 0.1
+    transmittance: 0.8
+    specularExp: 125.0
+    ior: 1.5
+  triangles:
+  - !<triangle>
+    material:
+      color: "#b0e0e6ff"
+      diffuse: 0.2
+      specular: 0.5
+      reflectivity: 0.1
+      transmittance: 0.8
+      specularExp: 125.0
+      ior: 1.5
+    v0:
+      x: 0.0
+      y: 1.0
+      z: -7.0
+    v1:
+      x: -1.0
+      y: 2.0
+      z: -6.0
+    v2:
+      x: -2.0
+      y: -1.0
+      z: -5.0
+  - !<triangle>
+    material:
+      color: "#b0e0e6ff"
+      diffuse: 0.2
+      specular: 0.5
+      reflectivity: 0.1
+      transmittance: 0.8
+      specularExp: 125.0
+      ior: 1.5
+    v0:
+      x: 0.0
+      y: 1.0
+      z: -7.0
+    v1:
+      x: 2.0
+      y: -1.0
+      z: -5.0
+    v2:
+      x: -2.0
+      y: -1.0
+      z: -5.0
+lights:
+- !<lightSource>
+  center:
+    x: 0.0
+    y: 5.0
+    z: 5.0
+  intensity: 0.9132671626045183
+- !<lightSource>
+  center:
+    x: -2.0
+    y: 2.0
+    z: 2.0
+  intensity: 0.5955136465208187
+- !<lightSource>
+  center:
+    x: 5.0
+    y: 1.0
+    z: 0.0
+  intensity: 0.531042498147884

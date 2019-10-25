@@ -35,6 +35,7 @@ public class Main extends Application {
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
         primaryStage.setResizable(false);
+        primaryStage.setTitle("Java Ray Tracer");
         primaryStage.show();
         root.requestFocus();
     }
