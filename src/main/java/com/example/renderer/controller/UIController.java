@@ -219,10 +219,6 @@ public class UIController implements Initializable {
         };
     }
 
-    public void printPixelPosition(MouseEvent e) {
-        log.debug("Mouse click at {}:{}", (int) e.getSceneX(), (int) e.getSceneY());
-    }
-
     private void generateScene() {
         Scene scene = new Scene();
         Random random = new Random();

@@ -13,8 +13,6 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import java.io.IOException;
 
 public class Main extends Application {
-    /*private double xOffset = 0;
-    private double yOffset = 0;*/
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -39,16 +37,6 @@ public class Main extends Application {
         primaryStage.setResizable(false);
         primaryStage.show();
         root.requestFocus();
-
-        /*primaryStage.initStyle(StageStyle.UNDECORATED);
-        root.setOnMousePressed(event -> {
-            xOffset = event.getSceneX();
-            yOffset = event.getSceneY();
-        });
-        root.setOnMouseDragged(event -> {
-            primaryStage.setX(event.getScreenX() - xOffset);
-            primaryStage.setY(event.getScreenY() - yOffset);
-        });*/
     }
 
     private void registerPrimaryStageBean(Stage primaryStage) {

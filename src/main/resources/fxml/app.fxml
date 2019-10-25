@@ -13,7 +13,7 @@
       fx:controller="com.example.renderer.controller.UIController">
     <StackPane alignment="TOP_LEFT" prefHeight="480.0" prefWidth="640.0">
         <StackPane>
-            <ImageView fx:id="image" fitHeight="480.0" fitWidth="640.0" onMouseClicked="#printPixelPosition"/>
+            <ImageView fx:id="image" fitHeight="480.0" fitWidth="640.0"/>
             <ProgressIndicator fx:id="loader" maxHeight="200.0" maxWidth="200.0" visible="false"/>
         </StackPane>
         <HBox fx:id="errorBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
