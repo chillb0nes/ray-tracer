@@ -1,1 +1,0 @@
-java -jar target/ray-tracer-1.0.0.jar
