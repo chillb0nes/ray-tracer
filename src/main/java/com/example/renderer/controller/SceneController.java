@@ -166,7 +166,8 @@ public class SceneController implements Initializable {
         fc.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("All Files", "*.*"),
                 new FileChooser.ExtensionFilter("JSON", "*.json"),
-                new FileChooser.ExtensionFilter("YAML", "*.yaml", "*.yml")
+                new FileChooser.ExtensionFilter("YAML", "*.yaml", "*.yml"),
+                new FileChooser.ExtensionFilter("OBJ", "*.obj")
         );
         fc.setTitle("Import Scene");
         File file = fc.showOpenDialog(stage);
@@ -181,6 +182,10 @@ public class SceneController implements Initializable {
                     break;
                 case "YAML":
                     scene = serializationService.fromYaml(value, Scene.class);
+                    break;
+                case "OBJ":
+                    scene = new Scene();
+                    scene.addObject(serializationService.fromObj(value));
                     break;
                 default:
                     scene = serializationService.fromFile(value, Scene.class);

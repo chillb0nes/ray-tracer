@@ -1,10 +1,15 @@
 package com.example.renderer.service.serialization;
 
+import com.example.renderer.model.Material;
+import com.example.renderer.model.object.Mesh;
+import com.example.renderer.model.object.Triangle;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.google.common.annotations.Beta;
+import javafx.geometry.Point3D;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -12,6 +17,10 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Log4j2
 @Getter
@@ -89,5 +98,46 @@ public class SerializationService {
         } catch (IOException e) {
             throw new UncheckedIOException("Failed to copy value", e);
         }
+    }
+
+    @Beta
+    public Mesh fromObj(String obj) {
+        try {
+            Map<Boolean, List<String>> verticlesAndFaces = Arrays.stream(obj.split("\\r?\\n"))
+                    .filter(line -> line.startsWith("v ") || line.startsWith("f "))
+                    .collect(Collectors.partitioningBy(s -> s.startsWith("v ")));
+
+            List<Point3D> verticles = verticlesAndFaces.get(true).stream()
+                    .map(SerializationService::toPoint3D)
+                    .collect(Collectors.toList());
+
+            List<Triangle> triangles = verticlesAndFaces.get(false).stream()
+                    .map(line -> {
+                        String[] verts = line.split(" ");
+                        return new Triangle(
+                                toPoint3D(verts[1], verticles),
+                                toPoint3D(verts[2], verticles),
+                                toPoint3D(verts[3], verticles)
+                        );
+                    })
+                    .collect(Collectors.toList());
+            return new Mesh(Material.DEFAULT, triangles);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to deserialize value", e);
+        }
+    }
+
+    private static Point3D toPoint3D(String line) {
+        String[] coords = line.split(" ");
+        return new Point3D(
+                Double.valueOf(coords[1]),
+                Double.valueOf(coords[2]),
+                Double.valueOf(coords[3])
+        );
+    }
+
+    private static Point3D toPoint3D(String vert, List<Point3D> verticles) {
+        int i = Integer.parseInt(vert.split("/")[0]) - 1;
+        return verticles.get(i);
     }
 }
