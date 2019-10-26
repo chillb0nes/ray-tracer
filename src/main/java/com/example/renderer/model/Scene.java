@@ -1,68 +1,162 @@
 package com.example.renderer.model;
 
 import com.example.renderer.model.light.LightSource;
+import com.example.renderer.model.object.Object3D;
 import com.example.renderer.model.object.Renderable;
-import com.google.common.collect.Sets;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.base.Preconditions;
+import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Point3D;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-import java.util.HashSet;
-import java.util.Set;
+import lombok.extern.log4j.Log4j2;
 
 @Data
+@Log4j2
 public class Scene {
-    public final static int DEFAULT_WIDTH = 640;
-    public final static int DEFAULT_HEIGHT = 480;
 
-    private final int width;
-    private final int height;
-    private double fov;
-    private boolean aaEnabled;
+    private IntegerProperty width;
+    private IntegerProperty height;
+    private DoubleProperty fov;
+    private BooleanProperty aaEnabled;
+    private ObjectProperty<Point3D> cameraOrigin;
+    private transient ObjectProperty<Object3D> selected;
 
-    private Point3D cameraOrigin;
-    private Set<Renderable> objects;
-    private Set<LightSource> lights;
-    @EqualsAndHashCode.Exclude
-    private Set<Renderable> selected;
+    private final ObservableList<Renderable> objects;
+    private final ObservableList<LightSource> lights;
 
-    public Scene(int width, int height) {
-        this.width = width;
-        this.height = height;
-
-        cameraOrigin = Point3D.ZERO;
-        objects = new HashSet<>();
-        lights = new HashSet<>();
-        selected = new HashSet<>();
+    public Scene() {
+        this(640, 480);
     }
 
-    public void setFov(double fov) {
-        this.fov = fov * Math.PI / 180;
+    public Scene(int width, int height) {
+        this.width = new SimpleIntegerProperty(width);
+        this.height = new SimpleIntegerProperty(height);
+
+        fov = new SimpleDoubleProperty(45);
+        aaEnabled = new SimpleBooleanProperty();
+        cameraOrigin = new SimpleObjectProperty<>(Point3D.ZERO);
+        selected = new SimpleObjectProperty<>();
+
+        objects = FXCollections.observableArrayList();
+        lights = FXCollections.observableArrayList();
     }
 
     public int getWidth() {
-        return aaEnabled ? width * 2 : width;
+        return isAaEnabled() ? width.get() * 2 : width.get();
     }
 
     public int getHeight() {
-        return aaEnabled ? height * 2 : height;
+        return isAaEnabled() ? height.get() * 2 : height.get();
     }
 
-    /*public void addObject(Renderable object) {
-        objects.add(object);
+    public IntegerProperty widthProperty() {
+        return width;
     }
 
-    public void removeObject(Renderable object) {
-        objects.remove(object);
+    public void setWidth(int width) {
+        this.width.set(width);
     }
 
-    public void addLight(LightSource light) {
-        lights.add(light);
+    public IntegerProperty heightProperty() {
+        return height;
     }
 
-    public void removeLight(LightSource light) {
-        lights.remove(light);
-    }*/
+    public void setHeight(int height) {
+        this.height.set(height);
+    }
+
+    public void addObject(Object3D object3D) {
+        if (object3D instanceof Renderable) {
+            objects.add((Renderable) object3D);
+        }
+        if (object3D instanceof LightSource) {
+            lights.add((LightSource) object3D);
+        }
+    }
+
+    public void addObjects(Object3D... objects3D) {
+        for (Object3D object3D : objects3D) {
+            addObject(object3D);
+        }
+    }
+
+    public void updateObject(Object3D oldValue, Object3D newValue) {
+        Preconditions.checkArgument(oldValue.getClass() == newValue.getClass());
+        if (oldValue instanceof Renderable) {
+            Preconditions.checkArgument(objects.contains(oldValue));
+            objects.set(objects.indexOf(oldValue), (Renderable) newValue);
+        }
+        if (oldValue instanceof LightSource) {
+            Preconditions.checkArgument(lights.contains(oldValue));
+            lights.set(lights.indexOf(oldValue), (LightSource) newValue);
+        }
+    }
+
+    public void removeObject(Object3D object3D) {
+        if (object3D instanceof Renderable) {
+            objects.remove(object3D);
+        }
+        if (object3D instanceof LightSource) {
+            lights.remove(object3D);
+        }
+    }
+
+    public double getFov() {
+        return fov.get();
+    }
+
+    @JsonIgnore
+    public double getFovRadians() {
+        return Math.toRadians(fov.get());
+    }
+
+    public void setFov(double fov) {
+        this.fov.set(fov);
+    }
+
+    public DoubleProperty fovProperty() {
+        return fov;
+    }
+
+    public boolean isAaEnabled() {
+        return aaEnabled.get();
+    }
+
+    public boolean getAaEnabled() {
+        return aaEnabled.get();
+    }
+
+    public void setAaEnabled(boolean aaEnabled) {
+        this.aaEnabled.set(aaEnabled);
+    }
+
+    public BooleanProperty aaEnabledProperty() {
+        return aaEnabled;
+    }
+
+    public Point3D getCameraOrigin() {
+        return cameraOrigin.get();
+    }
+
+    public void setCameraOrigin(Point3D cameraOrigin) {
+        this.cameraOrigin.set(cameraOrigin);
+    }
+
+    public ObjectProperty<Point3D> cameraOriginProperty() {
+        return cameraOrigin;
+    }
+
+    public Object3D getSelected() {
+        return selected.get();
+    }
+
+    public ObjectProperty<Object3D> selectedProperty() {
+        return selected;
+    }
+
+    public void setSelected(Object3D selected) {
+        this.selected.set(selected);
+    }
 }

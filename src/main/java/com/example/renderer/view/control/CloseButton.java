@@ -5,12 +5,15 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
+import lombok.Getter;
 
+@Getter
 public class CloseButton extends StackPane {
+    private Button button;
     private ObjectProperty<EventHandler<ActionEvent>> onAction;
 
     public CloseButton() {
-        Button button = new Button();
+        button = new Button();
         onAction = button.onActionProperty();
         getChildren().add(button);
         getStyleClass().add("close-btn");
@@ -25,11 +28,11 @@ public class CloseButton extends StackPane {
         return onAction.get();
     }
 
-    public ObjectProperty<EventHandler<ActionEvent>> onActionProperty() {
-        return onAction;
-    }
-
     public void setOnAction(EventHandler<ActionEvent> value) {
         onAction.set(value);
+    }
+
+    public ObjectProperty<EventHandler<ActionEvent>> onActionProperty() {
+        return onAction;
     }
 }

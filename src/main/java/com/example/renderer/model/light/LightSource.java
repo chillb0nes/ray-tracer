@@ -4,8 +4,10 @@ import com.example.renderer.model.object.Object3D;
 import javafx.geometry.Point3D;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class LightSource implements Object3D {
 

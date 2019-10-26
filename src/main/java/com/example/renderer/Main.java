@@ -1,60 +1,54 @@
 package com.example.renderer;
 
 import com.example.renderer.controller.UIController;
-import com.example.renderer.model.Material;
-import com.example.renderer.model.object.Sphere;
-import com.example.renderer.service.ModalService;
-import com.example.renderer.view.control.MeshControl;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Point3D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import java.io.IOException;
 
 public class Main extends Application {
-    /*private double xOffset = 0;
-    private double yOffset = 0;*/
+
+    @Autowired
+    private ApplicationContext applicationContext;
+
+    @Autowired
+    private FXMLLoader fxmlLoader;
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/app.fxml"));
-        Parent root = loader.load();
+    public void start(Stage primaryStage) throws IOException {
+        SpringConfiguration.initContext(this);
+        registerPrimaryStageBean(primaryStage);
+        fxmlLoader.setLocation(getClass().getResource("/fxml/app.fxml"));
+        Parent root = fxmlLoader.load();
         Scene scene = new Scene(root);
         scene.getStylesheets().add("/style.css");
 
-        UIController controller = loader.getController();
-        controller.setStage(primaryStage);
-
+        UIController controller = fxmlLoader.getController();
         Thread.currentThread().setUncaughtExceptionHandler(controller.getExceptionHandler());
 
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
         primaryStage.setResizable(false);
-        primaryStage.setOnCloseRequest(windowEvent -> {
-            controller.shutdown();
-            Platform.exit();
-        });
-
-        /*primaryStage.initStyle(StageStyle.UNDECORATED);
-        root.setOnMousePressed(event -> {
-            xOffset = event.getSceneX();
-            yOffset = event.getSceneY();
-        });
-        root.setOnMouseDragged(event -> {
-            primaryStage.setX(event.getScreenX() - xOffset);
-            primaryStage.setY(event.getScreenY() - yOffset);
-        });*/
-
-        scene = new Scene(new MeshControl());
-        scene.getStylesheets().add("/style.css");
-        primaryStage.setScene(scene);
-
+        primaryStage.setTitle("Java Ray Tracer");
         primaryStage.show();
+        root.requestFocus();
+    }
 
-        controller.setUp();
+    private void registerPrimaryStageBean(Stage primaryStage) {
+        ((AnnotationConfigApplicationContext) applicationContext)
+                .registerBean("primaryStage", Stage.class, () -> primaryStage);
+    }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        System.exit(0);
     }
 
     public static void main(String... args) {

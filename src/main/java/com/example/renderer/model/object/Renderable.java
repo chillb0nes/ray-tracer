@@ -3,14 +3,13 @@ package com.example.renderer.model.object;
 import com.example.renderer.model.Material;
 import com.example.renderer.model.RayHit;
 import javafx.geometry.Point3D;
-import javafx.scene.paint.Color;
+import lombok.Data;
 
-public interface Renderable extends Object3D {
+@Data
+public abstract class Renderable implements Object3D {
 
-    Material getMaterial();
+    protected Material material;
 
-    void setMaterial(Material material);
-
-    RayHit intersection(Point3D origin, Point3D direction);
+    public abstract RayHit intersection(Point3D origin, Point3D direction);
 
 }

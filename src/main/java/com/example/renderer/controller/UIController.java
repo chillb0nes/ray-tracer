@@ -3,219 +3,197 @@ package com.example.renderer.controller;
 import com.example.renderer.model.Material;
 import com.example.renderer.model.Scene;
 import com.example.renderer.model.light.LightSource;
-import com.example.renderer.model.object.*;
-import com.example.renderer.service.ModalService;
-import com.example.renderer.service.RenderService;
-import com.example.renderer.view.component.InputGroup;
-import com.example.renderer.view.component.ScrollablePane;
-import com.example.renderer.view.control.Point3DSpinner;
-import com.google.common.collect.ImmutableSet;
+import com.example.renderer.model.object.Mesh;
+import com.example.renderer.model.object.Object3D;
+import com.example.renderer.model.object.Sphere;
+import com.example.renderer.model.object.Triangle;
+import com.example.renderer.service.render.RenderService;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.Event;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.geometry.Point3D;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.logging.log4j.ThreadContext;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Collections;
-import java.util.Locale;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Random;
+import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static com.example.renderer.view.util.ObservableUtils.addListener;
+
+@Log4j2
 @Setter
-public class UIController {
+public class UIController implements Initializable {
     @FXML
     public HBox root;
     @FXML
     public VBox sidebar;
     @FXML
-    private ImageView image;
-    @FXML
     public ProgressIndicator loader;
     @FXML
-    private Label fovLabel;
-    @FXML
-    private Slider fovSlider;
-    @FXML
-    private InputGroup sceneControls;
-    @FXML
-    private Button importBtn;
-    @FXML
-    private Button exportBtn;
-    @FXML
-    private ListView<Object3D> objectList;
-    @FXML
-    private Point3DSpinner objectPosition;
-    @FXML
-    private MenuButton newObjectBtn;
-    @FXML
-    private MenuItem sphereItem;
-    @FXML
-    private MenuItem polygonItem;
-    @FXML
-    private MenuItem meshItem;
-    @FXML
-    private CheckBox aaCheckBox;
+    private ImageView image;
     @FXML
     private Button saveBtn;
-    @FXML
-    private ScrollablePane imageArea;
-    @FXML
-    private ScrollablePane sliderArea;
     @FXML
     private HBox errorBox;
     @FXML
     private Label errorBoxText;
 
-    private Scene scene;
-    private ObservableList<Object3D> sceneObjects;
-    private RenderService renderService;
-    private ModalService modalService;
-    private Stage stage;
-    private Timeline errorBoxAnimation;
+    @FXML
+    private CameraController cameraController;
 
     @FXML
-    public void initialize() {
-        scene = new Scene(Scene.DEFAULT_WIDTH, Scene.DEFAULT_HEIGHT);
-        sceneObjects = FXCollections.observableArrayList();
+    private SceneController sceneController;
 
-        modalService = new ModalService();
+    @Autowired
+    private RenderService renderService;
 
-        renderService = new RenderService();
-        renderService.setExecutor(Executors.newSingleThreadExecutor());
-        renderService.setOnRunning(e -> {
-            loader.setVisible(true);
-        });
-        renderService.setOnSucceeded(e -> {
-            image.setImage(renderService.getValue());
-            loader.setVisible(false);
-            renderService.reset();
-        });
+    @Autowired
+    private Stage stage;
 
-        fovSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            double increment = fovSlider.getBlockIncrement();
-            double value = Math.round(newValue.doubleValue() / increment) * increment;
-            fovSlider.setValue(value);
-            fovLabel.setText(String.format(Locale.US, "%.1f", value));
-            scene.setFov(value);
-            update();
-        });
-        fovSlider.setValue(45);
+    @Autowired
+    private SceneHolder sceneHolder;
 
-        /*imageArea.setOnScrollEnded(this::changeFovValue);
-        sliderArea.setOnScrollEnded(this::changeFovValue);*/
+    private ObservableList<Object3D> sceneObjects;
+    private ExecutorService loaderPresenter;
+    private Timeline errorBoxAnimation;
 
-        ReadOnlyDoubleProperty widthProperty = objectPosition.widthProperty();
-        objectList.prefWidthProperty().bind(widthProperty);
-        importBtn.prefWidthProperty().bind(widthProperty.divide(2));
-        exportBtn.prefWidthProperty().bind(widthProperty.divide(2));
-        newObjectBtn.prefWidthProperty().bind(widthProperty);
-        aaCheckBox.prefWidthProperty().bind(widthProperty);
-        saveBtn.prefWidthProperty().bind(sceneControls.widthProperty());
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        saveBtn.prefWidthProperty().bind(sceneController.getRoot().widthProperty());
+        saveBtn.disableProperty().bind(image.imageProperty().isNull());
+        errorBoxAnimation = slideFromTopAnimation();
 
-        objectList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue instanceof Renderable) {
-                //scene.setSelected(ImmutableSet.of((Renderable) newValue));
-                //`update();
+        configureRenderService();
+
+        root.setOnKeyPressed(keyEvent -> {
+            if (keyEvent.isControlDown()
+                    && keyEvent.isAltDown()
+                    && KeyCode.Z == keyEvent.getCode()) {
+                generateScene();
             }
         });
 
-        aaCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            scene.setAaEnabled(newValue);
-            update();
+        sceneHolder.setScene(new Scene());
+        sceneHolder.registerListener(this::update);
+        sceneHolder.requestUpdate();
+    }
+
+    private void configureRenderService() {
+        renderService.setOnRunning(e -> {
+            long startTime = System.currentTimeMillis();
+            showLoader();
+            ThreadContext.push(String.valueOf(startTime));
         });
-
-        errorBoxAnimation = slideFromTopAnimation();
-    }
-
-    public void setUp() {
-        hideErrorBox();
-        resetFocus();
-    }
-
-    private void updateCamera(Double x, Double y, Double z) {
-        if (x == null) x = scene.getCameraOrigin().getX();
-        if (y == null) y = scene.getCameraOrigin().getY();
-        if (z == null) z = scene.getCameraOrigin().getZ();
-
-        scene.setCameraOrigin(new Point3D(x, y, z));
-    }
-
-    public void updateModel() {
-        generateModel();
-
-        sceneObjects.clear();
-        sceneObjects.addAll(scene.getObjects());
-        sceneObjects.addAll(scene.getLights());
-
-        objectList.setItems(sceneObjects);
-        update();
+        renderService.setOnSucceeded(e -> {
+            image.setImage(renderService.getValue());
+            hideLoader();
+            log.debug("Image is rendered in {}ms", () -> {
+                String start = ThreadContext.pop();
+                return System.currentTimeMillis() - Long.parseLong(start);
+            });
+        });
+        renderService.setOnCancelled(e -> {
+            log.trace("Render task cancelled");
+            hideLoader();
+        });
+        renderService.setOnFailed(e -> {
+            log.error("Render task failed", renderService.getException());
+            hideLoader();
+        });
     }
 
     private void update() {
-        renderService.render(scene);
+        sceneObjects = FXCollections.observableArrayList();
+        sceneObjects.addAll(sceneHolder.getScene().getObjects());
+        sceneObjects.addAll(sceneHolder.getScene().getLights());
+        sceneController.getObjectList().setItems(sceneObjects);
+        renderService.render(sceneHolder.getScene());
     }
 
     public void resetFocus() {
-        objectList.getSelectionModel().clearSelection();
-        scene.setSelected(Collections.emptySet());
+        sceneController.getObjectList().getSelectionModel().clearSelection();
         root.requestFocus();
     }
 
-    private void changeFovValue(ScrollEvent scrollEvent) {
-        if (scrollEvent.getTextDeltaY() > 0) {
-            fovSlider.increment();
-        } else {
-            fovSlider.decrement();
+    public void saveImage() throws IOException {
+        FileChooser fc = new FileChooser();
+        fc.setInitialDirectory(sceneController.getLastSelectedFile());
+        fc.getExtensionFilters().addAll(
+                new ExtensionFilter("JPG", "*.jpg", "*.jpeg"),
+                new ExtensionFilter("GIF", "*.gif"),
+                new ExtensionFilter("PNG", "*.png")
+        );
+        fc.setTitle("Save Image");
+        File file = fc.showSaveDialog(stage);
+        if (file != null) {
+            sceneController.setLastSelectedFile(file.getParentFile());
+            String extension = fc.getSelectedExtensionFilter().getDescription();
+            ImageIO.write(toBufferedImage(image.getImage(), extension), extension, file);
+            log.debug("Saved current image to {}", file);
         }
-        update();
     }
 
-    public void importScene() {
-        throw new UnsupportedOperationException("importScene not implemented");
+    private BufferedImage toBufferedImage(Image image, String extension) {
+        BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);
+        if (!"jpg".equalsIgnoreCase(extension)) {
+            return bImage;
+        }
+        // fix for wrong colors in jpg files
+        BufferedImage bImage1 = new BufferedImage(bImage.getWidth(), bImage.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+        bImage1.getGraphics().drawImage(bImage, 0, 0, null);
+        return bImage1;
     }
 
-    public void exportScene() {
-        throw new UnsupportedOperationException("exportScene not implemented");
+    private void showLoader() {
+        loaderPresenter = Executors.newSingleThreadExecutor();
+        loaderPresenter.execute(() -> {
+            try {
+                Thread.sleep(200);
+                loader.setVisible(true);
+            } catch (InterruptedException e) {
+                loader.setVisible(false);
+            }
+        });
     }
 
-    public void saveImage() {
-        throw new UnsupportedOperationException("saveImage not implemented");
-    }
-
-    public void editObject() {
-        Object3D selectedItem = objectList.getSelectionModel().getSelectedItem();
-        Stage editDialog = modalService.createEditModal(selectedItem, stage);
-        editDialog.show();
+    private void hideLoader() {
+        loader.setVisible(false);
+        if (loaderPresenter != null) {
+            loaderPresenter.shutdownNow();
+        }
     }
 
     public void closeErrorBox() {
-        hideErrorBox();
-        errorBoxText.setText("");
-    }
-
-    private void hideErrorBox() {
         double totalHeight = errorBox.getHeight() + errorBox.getInsets().getTop() + errorBox.getLayoutY();
         errorBox.translateYProperty().setValue(-totalHeight);
+        errorBox.setVisible(false);
     }
 
     private Timeline slideFromTopAnimation() {
@@ -228,26 +206,21 @@ public class UIController {
 
     public Thread.UncaughtExceptionHandler getExceptionHandler() {
         return (t, e) -> {
-            hideErrorBox();
+            log.error("Uncaught exception:", e);
+            closeErrorBox();
 
             String message = ExceptionUtils.getMessage(e);
             String cause = ExceptionUtils.getRootCauseMessage(e);
             String errorMessage = String.format("[ERROR] %s \nCaused by %s", message, cause);
 
             errorBoxText.setText(errorMessage);
+            errorBox.setVisible(true);
             errorBoxAnimation.play();
         };
     }
 
-    public void printPixelPosition(MouseEvent e) {
-        System.out.printf("%s %s%n", e.getSceneX(), e.getSceneY());
-    }
-
-    public void shutdown() {
-        ((ExecutorService) renderService.getExecutor()).shutdownNow();
-    }
-
-    private void generateModel() {
+    private void generateScene() {
+        Scene scene = new Scene();
         Random random = new Random();
         Sphere sphere1 = new Sphere(new Point3D(0, -1, -7), 0.5, Material.random());
 
@@ -266,29 +239,29 @@ public class UIController {
                 new Point3D(0, 1, -7),
                 new Point3D(2, -1, -5),
                 new Point3D(1, 2, -6),
-                Material.RUBBER);
+                Material.random());
 
         Triangle triangle2 = new Triangle(
                 new Point3D(0, 1, -7),
                 new Point3D(-1, 2, -6),
-                new Point3D(-2, -1, -5),
-                Material.RUBBER);
+                new Point3D(-2, -1, -5));
 
         Triangle triangle3 = new Triangle(
                 new Point3D(0, 1, -7),
                 new Point3D(2, -1, -5),
-                new Point3D(-2, -1, -5),
-                Material.IVORY);
+                new Point3D(-2, -1, -5));
 
-        Mesh mesh1 = new Mesh();
+        Mesh mesh1 = new Mesh(Material.random(), triangle2, triangle3);
 
-        scene.setObjects(ImmutableSet.of(sphere1, sphere2, sphere3, sphere4, sphere5, sphere6, sphere7, sphere8,
-                triangle1, triangle2, triangle3, mesh1));
+        LightSource light1 = new LightSource(new Point3D(0, 5, 5), random.nextDouble());
+        LightSource light2 = new LightSource(new Point3D(-2, 2, 2), random.nextDouble());
+        LightSource light3 = new LightSource(new Point3D(5, 1, 0), random.nextDouble());
 
-        LightSource light1 = new LightSource(new Point3D(0, 5, 5), random.nextDouble() * 2);
-        LightSource light2 = new LightSource(new Point3D(-2, 2, 2), random.nextDouble() * 2);
-        LightSource light3 = new LightSource(new Point3D(5, 1, 0), random.nextDouble() * 2);
-
-        scene.setLights(ImmutableSet.of(light1, light2, light3));
+        scene.addObjects(
+                sphere1, sphere2, sphere3, sphere4, sphere5, sphere6, sphere7, sphere8,
+                triangle1, triangle2, triangle3,
+                mesh1,
+                light1, light2, light3);
+        sceneHolder.setScene(scene);
     }
 }

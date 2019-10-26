@@ -9,12 +9,10 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import lombok.Getter;
 
-import static javafx.geometry.Pos.CENTER;
+import static javafx.geometry.Pos.TOP_CENTER;
 
 public class InputGroup extends StackPane {
-    private static final String DEFAULT_NAME = "Input group";
     private static final int PADDING = 10;
 
     private Label groupLabel;
@@ -23,15 +21,19 @@ public class InputGroup extends StackPane {
 
     public InputGroup() {
         getStyleClass().add("input-group");
+        setStyle("-fx-border-color: -fx-box-border");
         setPadding(new Insets(PADDING * 1.5, PADDING, PADDING, PADDING));
 
-        groupLabel = new Label(DEFAULT_NAME);
+        groupLabel = new Label("Input group");
         groupLabel.getStyleClass().add("group-label");
+        groupLabel.setStyle(
+                "-fx-background-color: -fx-background;" +
+                "-fx-text-fill: derive(-fx-box-border, -20%)");
         groupLabel.setPadding(new Insets(3));
         groupLabel.translateYProperty().bind(heightProperty().add(PADDING / 2).divide(-2));
 
         children = new VBox();
-        children.setAlignment(CENTER);
+        children.setAlignment(TOP_CENTER);
         children.setSpacing(PADDING);
 
         spacing = new SimpleDoubleProperty();
@@ -68,11 +70,11 @@ public class InputGroup extends StackPane {
         return spacing;
     }
 
-    public final void setSpacing(double value) {
-        spacing.setValue(value);
-    }
-
     public final double getSpacing() {
         return spacing.get();
+    }
+
+    public final void setSpacing(double value) {
+        spacing.setValue(value);
     }
 }
