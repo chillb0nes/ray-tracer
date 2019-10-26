@@ -1,5 +1,11 @@
 # Java Ray Tracer
 
+![Travis (.com)](https://img.shields.io/travis/com/Stingray42/ray-tracer)
+![Codecov](https://img.shields.io/codecov/c/github/Stingray42/ray-tracer)
+![Snyk Vulnerabilities for GitHub Repo](https://img.shields.io/snyk/vulnerabilities/github/Stingray42/ray-tracer)
+![LGTM Grade](https://img.shields.io/lgtm/grade/java/github/Stingray42/ray-tracer)
+![LGTM Alerts](https://img.shields.io/lgtm/alerts/github/Stingray42/ray-tracer)
+
 This is simple ray tracer with JavaFX GUI that can render some 3D figures. 
 
 ## Features
