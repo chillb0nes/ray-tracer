@@ -1,10 +1,10 @@
 # Java Ray Tracer
 
-![Travis (.com)](https://img.shields.io/travis/com/Stingray42/ray-tracer)
-![Codecov](https://img.shields.io/codecov/c/github/Stingray42/ray-tracer)
-![Snyk Vulnerabilities for GitHub Repo](https://img.shields.io/snyk/vulnerabilities/github/Stingray42/ray-tracer)
-![LGTM Grade](https://img.shields.io/lgtm/grade/java/github/Stingray42/ray-tracer)
-![LGTM Alerts](https://img.shields.io/lgtm/alerts/github/Stingray42/ray-tracer)
+[![Build Status](https://travis-ci.com/Stingray42/ray-tracer.svg?branch=master)](https://travis-ci.com/Stingray42/ray-tracer)
+[![codecov](https://codecov.io/gh/Stingray42/ray-tracer/branch/master/graph/badge.svg)](https://codecov.io/gh/Stingray42/ray-tracer)
+[![Known Vulnerabilities](https://snyk.io/test/github/Stingray42/ray-tracer/badge.svg)](https://snyk.io/test/github/Stingray42/ray-tracer)
+[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/Stingray42/ray-tracer.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Stingray42/ray-tracer/context:java)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/Stingray42/ray-tracer.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Stingray42/ray-tracer/alerts/)
 
 This is simple ray tracer with JavaFX GUI that can render some 3D figures. 
 
