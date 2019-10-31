@@ -18,11 +18,12 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point3D;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -44,8 +45,6 @@ import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import static com.example.renderer.view.util.ObservableUtils.addListener;
 
 @Log4j2
 @Setter
@@ -93,7 +92,7 @@ public class UIController implements Initializable {
         configureRenderService();
 
         root.setOnKeyPressed(keyEvent -> {
-            if (keyEvent.isControlDown()
+            if (keyEvent.isShortcutDown()
                     && keyEvent.isAltDown()
                     && KeyCode.Z == keyEvent.getCode()) {
                 generateScene();

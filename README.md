@@ -28,7 +28,7 @@ mvn package
 ```cmd
 java -jar target/ray-tracer-1.0.0.jar
 ```
-Use GUI to add or remove objects, import sample scene, or press `Ctrl+Alt+Z` to generate *random* scene.
+Use GUI to add or remove objects, import sample scene, or press `Ctrl(⌘)+Alt+Z` to generate *random* scene.
 
 ## Screenshots
 ![](https://raw.githubusercontent.com/Stingray42/ray-tracer/master/src/main/resources/screenshots/0.png)
