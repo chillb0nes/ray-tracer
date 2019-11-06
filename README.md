@@ -34,6 +34,7 @@ Use GUI to add or remove objects, import sample scene, or press `Ctrl(⌘)+Alt+Z
 ![](https://raw.githubusercontent.com/Stingray42/ray-tracer/master/src/main/resources/screenshots/0.png)
 ![](https://raw.githubusercontent.com/Stingray42/ray-tracer/master/src/main/resources/screenshots/1.png)
 ![](https://raw.githubusercontent.com/Stingray42/ray-tracer/master/src/main/resources/screenshots/2.png)
+![](https://raw.githubusercontent.com/Stingray42/ray-tracer/master/src/main/resources/screenshots/3.png)
 
 ## Credits
 
