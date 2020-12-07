@@ -5,6 +5,7 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/Stingray42/ray-tracer/badge.svg)](https://snyk.io/test/github/Stingray42/ray-tracer)
 [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/Stingray42/ray-tracer.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Stingray42/ray-tracer/context:java)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/Stingray42/ray-tracer.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Stingray42/ray-tracer/alerts/)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FStingray42%2Fray-tracer.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FStingray42%2Fray-tracer?ref=badge_shield)
 
 This is simple ray tracer with JavaFX GUI that can render some 3D figures. 
 
@@ -43,3 +44,7 @@ Ray-tracing algorithms mostly based on [scratchapixel.com](https://www.scratchap
 Icons by [icons8.com](https://icons8.com/)
 
 Suzanne by [blender.org](https://www.blender.org/)
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FStingray42%2Fray-tracer.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FStingray42%2Fray-tracer?ref=badge_large)
